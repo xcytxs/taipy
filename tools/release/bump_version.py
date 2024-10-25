@@ -93,5 +93,5 @@ if __name__ == "__main__":
     for _path in paths:
         _version = extract_version(_path)
         bump_ext_version(_version, _path)
-    print(f"NEW_VERSION={_version.dev_name}")
+    print(f"NEW_VERSION={_version.dev_name}") # noqa T201 # type: ignore[reportPossiblyUnboundVariable]
 
