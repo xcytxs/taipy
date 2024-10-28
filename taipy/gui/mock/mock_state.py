@@ -37,7 +37,7 @@ class MockState(State):
         return self._gui
 
     def __getattribute__(self, name: str) -> t.Any:
-        if attr := t.cast(dict, super().__getattribute__(MockState.__VARS)).get(name):
+        if (attr := t.cast(dict, super().__getattribute__(MockState.__VARS)).get(name, None)) is not None:
             return attr
         try:
             return super().__getattribute__(name)

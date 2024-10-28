@@ -100,3 +100,7 @@ def test_callback():
     ms = MockState(Gui(""), a=1)
     on_action(ms)
     assert ms.a == 2
+
+def test_false():
+    ms = MockState(Gui(""), a=False)
+    assert ms.a is False
