@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback, ReactNode } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     createRequestDataUpdateAction,
     RowType,
     RowValue,
     useDispatch,
     useDispatchRequestUpdateOnFirstRender,
-    useDynamicProperty,
     useModule,
 } from "taipy-gui";
 
@@ -18,16 +17,23 @@ interface BasicTableProps {
 }
 
 const BasicTable = (props: BasicTableProps) => {
+    const {
+        data,
+        rowsPerPage,
+        updateVarName = "",
+        updateVars = "",
+        id
+    } = props;
     const [value, setValue] = useState<Record<string, unknown>>({});
     const [currentPage, setCurrentPage] = useState(1);
     const dispatch = useDispatch();
     const module = useModule();
-    const refresh = props.data?.__taipy_refresh !== undefined;
-    useDispatchRequestUpdateOnFirstRender(dispatch, props.id, module, props.updateVars, props.updateVarName);
+    const refresh = data?.__taipy_refresh !== undefined;
+    useDispatchRequestUpdateOnFirstRender(dispatch, id, module, updateVars, updateVarName);
 
-    // Memoize column order and columns
-    const [colsOrder, columns] = useMemo(() => {
-        const colsOrder = Object.keys(value || {}).sort();
+    // Memoize column order
+    const [colsOrder] = useMemo(() => {
+        const colsOrder = Object.keys(value || {});
         return [colsOrder, value || {}];
     }, [value]);
 
@@ -48,21 +54,19 @@ const BasicTable = (props: BasicTableProps) => {
 
     // Memoize paginated rows
     const paginatedRows = useMemo(() => {
-        if (props.rowsPerPage === undefined) {
-            return rows; // Show all rows if itemsPerPage is undefined
+        if (rowsPerPage === undefined) {
+            return rows;
         }
-        const itemsPerPageValue = props.rowsPerPage ?? 10;
-        const startIndex = (currentPage - 1) * itemsPerPageValue;
-        return rows.slice(startIndex, startIndex + itemsPerPageValue);
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        return rows.slice(startIndex, startIndex + rowsPerPage);
     }, [rows, currentPage, props.rowsPerPage]);
 
-    // Update data callback
-    const updateData = useCallback(() => {
-        if (refresh || !props.data) {
+    useEffect(() => {
+        if (refresh || !data) {
             dispatch(
                 createRequestDataUpdateAction(
-                    props.updateVarName,
-                    props.id,
+                    updateVarName,
+                    id,
                     module,
                     colsOrder,
                     "",
@@ -72,33 +76,15 @@ const BasicTable = (props: BasicTableProps) => {
                 ),
             );
         } else {
-            setValue(props.data);
+            setValue(data);
         }
-    }, [refresh, props.data, colsOrder, props.updateVarName, props.id, dispatch, module]);
-
-    // Effect to update data on mount and when dependencies change
-    useEffect(() => {
-        updateData();
-    }, [updateData]);
-
-    // Render cell content
-    const renderCell = useCallback((cellValue: unknown): ReactNode => {
-        const isDateString =
-            typeof cellValue === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(cellValue);
-        const dateValue = isDateString && !isNaN(Date.parse(cellValue)) ? new Date(cellValue) : null;
-        return dateValue
-            ? dateValue.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-              })
-            : (cellValue as ReactNode);
-    }, []);
+    }, [refresh, data, colsOrder, updateVarName, id, dispatch, module]);
 
     // Handle next page
     const handleNextPage = () => {
-        const itemsPerPageValue = props.rowsPerPage ?? 10;
-        setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(rows.length / itemsPerPageValue)));
+        if (rowsPerPage) {
+            setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(rows.length / rowsPerPage)));
+        }
     };
 
     // Handle previous page
@@ -108,35 +94,33 @@ const BasicTable = (props: BasicTableProps) => {
 
     return (
         <div>
-            <h2>Paginated table</h2>
             <table border={1} cellPadding={10} cellSpacing={0}>
                 <thead>
                     {colsOrder.map((col, idx) => (
-                        <td key={col + idx}>{col}</td>
+                        <th key={col + idx}>{col}</th>
                     ))}
                 </thead>
                 <tbody>
                     {paginatedRows.map((row, index) => (
                         <tr key={"row" + index}>
                             {colsOrder.map((col, cidx) => (
-                                <td key={"val" + index + "-" + cidx}>{renderCell(row[col])}</td>
+                                <td key={"val" + index + "-" + cidx}>{row[col]}</td>
                             ))}
                         </tr>
                     ))}
                 </tbody>
             </table>
-            {props.rowsPerPage !== undefined && (
+            {rowsPerPage !== undefined && (
                 <div>
                     <button onClick={handlePreviousPage} disabled={currentPage === 1}>
                         Previous
                     </button>
                     <span>
-                        {" "}
-                        Page {currentPage} of {Math.ceil(rows.length / (props.rowsPerPage ?? 10))}{" "}
+                        Page {currentPage} of {Math.ceil(rows.length / rowsPerPage)}
                     </span>
                     <button
                         onClick={handleNextPage}
-                        disabled={currentPage === Math.ceil(rows.length / (props.rowsPerPage ?? 10))}
+                        disabled={currentPage === Math.ceil(rows.length / rowsPerPage)}
                     >
                         Next
                     </button>

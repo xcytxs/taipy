@@ -1,17 +1,21 @@
-import random
-
 from example_library import ExampleLibrary
+from faker import Faker
 
 from taipy.gui import Gui
 
+fake = Faker()
+
 data = {
-    "date": [f"2000-03-{(i % 31) + 1:02d}T00:00:00.000Z" for i in range(100)],
-    "volume": [random.randint(1000, 10000) for _ in range(100)],
-    "price": [round(random.uniform(100, 200), 3) for _ in range(100)],
+    "Employee ID": list(range(101, 201)),
+    "Name": [fake.name() for _ in range(100)],
+    "Department": [fake.random_element(elements=("Human Resources", "Engineering", "Marketing", "Sales", "Customer Support")) for _ in range(100)],
+    "Role": [fake.random_element(elements=("HR Manager", "Software Engineer", "Marketing Director", "Sales Executive", "Support Specialist")) for _ in range(100)],
+    "Location": [fake.city() for _ in range(100)]
 }
 
 page = """
-<|{data}|example.basic_table|rows_per_page=5|>
+## Employee Directory
+<|{data}|example.basic_table|>
 """
 
 if __name__ == "__main__":
