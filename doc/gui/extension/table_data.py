@@ -8,8 +8,18 @@ fake = Faker()
 data = {
     "Employee ID": list(range(101, 201)),
     "Name": [fake.name() for _ in range(100)],
-    "Department": [fake.random_element(elements=("Human Resources", "Engineering", "Marketing", "Sales", "Customer Support")) for _ in range(100)],
-    "Role": [fake.random_element(elements=("HR Manager", "Software Engineer", "Marketing Director", "Sales Executive", "Support Specialist")) for _ in range(100)],
+    "Department": [
+        fake.random_element(
+            elements=("Human Resources", "Engineering", "Marketing", "Sales", "Customer Support")
+        )
+        for _ in range(100)
+    ],
+    "Role": [
+        fake.random_element(
+            elements=("HR Manager", "Software Engineer", "Marketing Director", "Sales Executive", "Support Specialist")
+        )
+        for _ in range(100)
+    ],
     "Location": [fake.city() for _ in range(100)]
 }
 
