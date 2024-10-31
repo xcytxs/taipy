@@ -1,8 +1,5 @@
-from docutils.nodes import title
-
-from example_library import ExampleLibrary
 import pandas as pd
-
+from example_library import ExampleLibrary
 
 from taipy.gui import Gui
 
