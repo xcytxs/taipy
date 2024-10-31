@@ -1,96 +1,57 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     createRequestDataUpdateAction,
-    RowType,
-    RowValue,
     useDispatch,
     useDispatchRequestUpdateOnFirstRender,
     useModule,
+    TaipyDynamicProps,
+    TableValueType,
+    RowType,
+    RowValue,
 } from "taipy-gui";
 
-interface BasicTableProps {
-    id?: string;
-    updateVarName?: string;
-    updateVars?: string;
-    data: Record<string, Record<string, unknown>>;
-    rowsPerPage?: number;
+interface BasicTableProps extends TaipyDynamicProps {
+    data: TableValueType;
 }
 
 const BasicTable = (props: BasicTableProps) => {
-    const {
-        data,
-        rowsPerPage,
-        updateVarName = "",
-        updateVars = "",
-        id
-    } = props;
-    const [value, setValue] = useState<Record<string, unknown>>({});
-    const [currentPage, setCurrentPage] = useState(1);
+    const { data, updateVarName = "", updateVars = "", id } = props;
+    const [value, setValue] = useState<TableValueType>({});
+    const pageKey = useRef("no-page-key");
     const dispatch = useDispatch();
     const module = useModule();
     const refresh = data?.__taipy_refresh !== undefined;
-    useDispatchRequestUpdateOnFirstRender(dispatch, id, module, updateVars, updateVarName);
+    useDispatchRequestUpdateOnFirstRender(dispatch, id, module, updateVars);
 
-    // Memoize column order
     const [colsOrder] = useMemo(() => {
         const colsOrder = Object.keys(value || {});
         return [colsOrder, value || {}];
     }, [value]);
 
-    // Memoize rows
     const rows = useMemo(() => {
         const rows: RowType[] = [];
         if (value) {
-            colsOrder.forEach(
-                (col) =>
-                    value[col] &&
-                    (value[col] as RowValue[]).forEach(
-                        (val, idx) => (rows[idx] = rows[idx] || {}) && (rows[idx][col] = val),
-                    ),
-            );
+            colsOrder.forEach((col) => {
+                if (value[col]) {
+                    value[col].forEach((val: RowValue, idx: number) => {
+                        rows[idx] = rows[idx] || {};
+                        rows[idx][col] = val;
+                    });
+                }
+            });
         }
         return rows;
     }, [value, colsOrder]);
 
-    // Memoize paginated rows
-    const paginatedRows = useMemo(() => {
-        if (rowsPerPage === undefined) {
-            return rows;
-        }
-        const startIndex = (currentPage - 1) * rowsPerPage;
-        return rows.slice(startIndex, startIndex + rowsPerPage);
-    }, [rows, currentPage, props.rowsPerPage]);
-
     useEffect(() => {
         if (refresh || !data) {
             dispatch(
-                createRequestDataUpdateAction(
-                    updateVarName,
-                    id,
-                    module,
-                    colsOrder,
-                    "",
-                    {},
-                    true,
-                    "TabularLibrary",
-                ),
+                createRequestDataUpdateAction(updateVarName, id, module, colsOrder, pageKey.current, {}, true, "ExampleLibrary")
             );
         } else {
-            setValue(data);
+            setValue(data[pageKey.current]);
         }
     }, [refresh, data, colsOrder, updateVarName, id, dispatch, module]);
-
-    // Handle next page
-    const handleNextPage = () => {
-        if (rowsPerPage) {
-            setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(rows.length / rowsPerPage)));
-        }
-    };
-
-    // Handle previous page
-    const handlePreviousPage = () => {
-        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-    };
 
     return (
         <div>
@@ -101,7 +62,7 @@ const BasicTable = (props: BasicTableProps) => {
                     ))}
                 </thead>
                 <tbody>
-                    {paginatedRows.map((row, index) => (
+                    {rows.map((row, index) => (
                         <tr key={"row" + index}>
                             {colsOrder.map((col, cidx) => (
                                 <td key={"val" + index + "-" + cidx}>{row[col]}</td>
@@ -110,22 +71,6 @@ const BasicTable = (props: BasicTableProps) => {
                     ))}
                 </tbody>
             </table>
-            {rowsPerPage !== undefined && (
-                <div>
-                    <button onClick={handlePreviousPage} disabled={currentPage === 1}>
-                        Previous
-                    </button>
-                    <span>
-                        Page {currentPage} of {Math.ceil(rows.length / rowsPerPage)}
-                    </span>
-                    <button
-                        onClick={handleNextPage}
-                        disabled={currentPage === Math.ceil(rows.length / rowsPerPage)}
-                    >
-                        Next
-                    </button>
-                </div>
-            )}
         </div>
     );
 };

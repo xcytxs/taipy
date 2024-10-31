@@ -37,8 +37,9 @@ class ExampleLibrary(ElementLibrary):
                 "data",
                 {
                     "data": ElementProperty(PropertyType.data),
-                    "rows_per_page": ElementProperty(PropertyType.number),
                 },
+                # The name of the React component (BasicTable) that implements this custom
+                # element, exported as BasicTable in front-end/src/index.ts
                 react_component="BasicTable",
             ),
         }

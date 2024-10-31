@@ -1,32 +1,29 @@
+from docutils.nodes import title
+
 from example_library import ExampleLibrary
-from faker import Faker
+import pandas as pd
+
 
 from taipy.gui import Gui
 
-fake = Faker()
+chessboard = [
+    ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
+    ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
+    ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"]
+]
 
-data = {
-    "Employee ID": list(range(101, 201)),
-    "Name": [fake.name() for _ in range(100)],
-    "Department": [
-        fake.random_element(
-            elements=("Human Resources", "Engineering", "Marketing", "Sales", "Customer Support")
-        )
-        for _ in range(100)
-    ],
-    "Role": [
-        fake.random_element(
-            elements=("HR Manager", "Software Engineer", "Marketing Director", "Sales Executive", "Support Specialist")
-        )
-        for _ in range(100)
-    ],
-    "Location": [fake.city() for _ in range(100)]
-}
+# Create a DataFrame to represent the chessboard
+data = pd.DataFrame(chessboard, index=[8, 7, 6, 5, 4, 3, 2, 1], columns=["A", "B", "C", "D", "E", "F", "G", "H"])
 
 page = """
-## Employee Directory
+## Chess Game
 <|{data}|example.basic_table|>
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(port=3001, use_reloader=True, title="Basic Table", debug=True)
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game")
