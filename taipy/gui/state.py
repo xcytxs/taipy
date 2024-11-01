@@ -11,11 +11,11 @@
 
 import inspect
 import typing as t
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from contextlib import nullcontext
 from operator import attrgetter
 from pathlib import Path
-from types import FrameType
+from types import FrameType, SimpleNamespace
 
 from flask import has_app_context
 
@@ -26,7 +26,7 @@ if t.TYPE_CHECKING:
     from .gui import Gui
 
 
-class State(ABC):
+class State(SimpleNamespace):
     """Accessor to the bound variables from callbacks.
 
     `State` is used when you need to access the value of variables
