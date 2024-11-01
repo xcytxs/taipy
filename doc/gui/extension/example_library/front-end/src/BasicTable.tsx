@@ -14,18 +14,18 @@ interface BasicTableProps extends TaipyDynamicProps {
     data: TableValueType;
 }
 
+const pageKey = "no-page-key";
+
 const BasicTable = (props: BasicTableProps) => {
     const { data, updateVarName = "", updateVars = "", id } = props;
     const [value, setValue] = useState<TableValueType>({});
-    const pageKey = useRef("no-page-key");
     const dispatch = useDispatch();
     const module = useModule();
     const refresh = data?.__taipy_refresh !== undefined;
     useDispatchRequestUpdateOnFirstRender(dispatch, id, module, updateVars);
 
-    const [colsOrder] = useMemo(() => {
-        const colsOrder = Object.keys(value || {});
-        return [colsOrder, value || {}];
+    const colsOrder = useMemo(() => {
+        return Object.keys(value || {});
     }, [value]);
 
     const rows = useMemo(() => {
@@ -44,12 +44,21 @@ const BasicTable = (props: BasicTableProps) => {
     }, [value, colsOrder]);
 
     useEffect(() => {
-        if (refresh || !data) {
+        if (refresh || !data || data[pageKey] === undefined) {
             dispatch(
-                createRequestDataUpdateAction(updateVarName, id, module, colsOrder, pageKey.current, {}, true, "ExampleLibrary")
+                createRequestDataUpdateAction(
+                    updateVarName,
+                    id,
+                    module,
+                    colsOrder,
+                    pageKey,
+                    {},
+                    true,
+                    "ExampleLibrary",
+                ),
             );
         } else {
-            setValue(data[pageKey.current]);
+            setValue(data[pageKey]);
         }
     }, [refresh, data, colsOrder, updateVarName, id, dispatch, module]);
 

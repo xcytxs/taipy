@@ -15,7 +15,7 @@ chessboard = [
 ]
 
 # Create a DataFrame to represent the chessboard
-data = pd.DataFrame(chessboard, index=[8, 7, 6, 5, 4, 3, 2, 1], columns=["A", "B", "C", "D", "E", "F", "G", "H"])
+data = pd.DataFrame(chessboard, columns=["A", "B", "C", "D", "E", "F", "G", "H"])
 
 page = """
 ## Chess Game
