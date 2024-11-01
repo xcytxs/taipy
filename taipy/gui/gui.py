@@ -1332,12 +1332,8 @@ class Gui:
         )
 
     def __send_ws_alert(
-            self, type: str,
-            message: str,
-            system_notification: bool,
-            duration: int,
-            notification_id: t.Optional[str] = None
-        ) -> None:
+        self, type: str, message: str, system_notification: bool, duration: int, notification_id: t.Optional[str] = None
+    ) -> None:
         payload = {
             "type": _WsType.ALERT.value,
             "atype": type,
@@ -2278,9 +2274,8 @@ class Gui:
                 message="",  # No need for a message when closing
                 system_notification=False,  # System notification not needed for closing
                 duration=0,  # No duration since it's an immediate close
-                notification_id=notification_id
+                notification_id=notification_id,
             )
-
 
     def _hold_actions(
         self,
@@ -2661,13 +2656,13 @@ class Gui:
             s if bool(urlparse(s).netloc) else f"{Gui._EXTENSION_ROOT}/{name}/{s}{lib.get_query(s)}"
             for name, libs in Gui.__extensions.items()
             for lib in libs
-            for s in (lib.get_scripts() or [])
+            for s in (lib._do_get_relative_paths(lib.get_scripts()))
         ]
         styles = [
             s if bool(urlparse(s).netloc) else f"{Gui._EXTENSION_ROOT}/{name}/{s}{lib.get_query(s)}"
             for name, libs in Gui.__extensions.items()
             for lib in libs
-            for s in (lib.get_styles() or [])
+            for s in (lib._do_get_relative_paths(lib.get_styles()))
         ]
         if self._get_config("stylekit", True):
             styles.append("stylekit/stylekit.css")
