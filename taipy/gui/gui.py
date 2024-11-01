@@ -21,6 +21,7 @@ import sys
 import tempfile
 import time
 import typing as t
+import uuid
 import warnings
 from importlib import metadata, util
 from importlib.util import find_spec
@@ -72,7 +73,7 @@ from .extension.library import Element, ElementLibrary
 from .page import Page
 from .partial import Partial
 from .server import _Server
-from .state import State
+from .state import State, _GuiState
 from .types import _WsType
 from .utils import (
     _delscopeattr,
@@ -1330,15 +1331,26 @@ class Gui:
             send_back_only=True,
         )
 
-    def __send_ws_alert(self, type: str, message: str, system_notification: bool, duration: int) -> None:
+    def __send_ws_alert(
+            self, type: str,
+            message: str,
+            system_notification: bool,
+            duration: int,
+            notification_id: t.Optional[str] = None
+        ) -> None:
+        payload = {
+            "type": _WsType.ALERT.value,
+            "atype": type,
+            "message": message,
+            "system": system_notification,
+            "duration": duration,
+        }
+
+        if notification_id:
+            payload["notificationId"] = notification_id
+
         self.__send_ws(
-            {
-                "type": _WsType.ALERT.value,
-                "atype": type,
-                "message": message,
-                "system": system_notification,
-                "duration": duration,
-            }
+            payload,
         )
 
     def __send_ws_partial(self, partial: str):
@@ -2242,13 +2254,33 @@ class Gui:
         message: str = "",
         system_notification: t.Optional[bool] = None,
         duration: t.Optional[int] = None,
+        notification_id: t.Optional[str] = None,
     ):
+        if not notification_id:
+            notification_id = str(uuid.uuid4())
+
         self.__send_ws_alert(
             notification_type,
             message,
             self._get_config("system_notification", False) if system_notification is None else system_notification,
             self._get_config("notification_duration", 3000) if duration is None else duration,
+            notification_id,
         )
+        return notification_id
+
+    def _close_notification(
+        self,
+        notification_id: str,
+    ):
+        if notification_id:
+            self.__send_ws_alert(
+                type="",  # Since you're closing, set type to an empty string or a predefined "close" type
+                message="",  # No need for a message when closing
+                system_notification=False,  # System notification not needed for closing
+                duration=0,  # No duration since it's an immediate close
+                notification_id=notification_id
+            )
+
 
     def _hold_actions(
         self,
@@ -2260,7 +2292,9 @@ class Gui:
             if isinstance(callback, str)
             else _get_lambda_id(t.cast(LambdaType, callback))
             if _is_unnamed_function(callback)
-            else callback.__name__ if callback is not None else None
+            else callback.__name__
+            if callback is not None
+            else None
         )
         func = self.__get_on_cancel_block_ui(action_name)
         def_action_name = func.__name__
@@ -2777,7 +2811,9 @@ class Gui:
         self.__var_dir.set_default(self.__frame)
 
         if self.__state is None or is_reloading:
-            self.__state = State(self, self.__locals_context.get_all_keys(), self.__locals_context.get_all_context())
+            self.__state = _GuiState(
+                self, self.__locals_context.get_all_keys(), self.__locals_context.get_all_context()
+            )
 
         if _is_in_notebook():
             # Allow gui.state.x in notebook mode

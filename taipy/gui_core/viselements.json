@@ -100,7 +100,7 @@
                     },
                     {
                         "name": "filter",
-                        "type": "bool|str|ScenarioFilter|list[str|ScenarioFilter]",
+                        "type": "bool|str|taipy.gui_core.filters.ScenarioFilter|list[str|taipy.gui_core.filters.ScenarioFilter]",
                         "default_value": "\"*\"",
                         "doc": "TODO: a list of <code>Scenario^</code> attributes to filter on. If False, do not allow filter."
                     },
@@ -112,7 +112,7 @@
                     },
                     {
                         "name": "sort",
-                        "type": "bool|str|ScenarioFilter|list[str|ScenarioFilter]",
+                        "type": "bool|str|taipy.gui_core.filters.ScenarioFilter|list[str|taipy.gui_core.filters.ScenarioFilter]",
                         "default_value": "\"*\"",
                         "doc": "TODO: a list of <code>Scenario^</code> attributes to sort on. If False, do not allow sort."
                     }
@@ -355,7 +355,7 @@
                     },
                     {
                         "name": "filter",
-                        "type": "bool|str|DataNodeFilter|list[str|DataNodeFilter]",
+                        "type": "bool|str|taipy.gui_core.filters.DataNodeFilter|list[str|taipy.gui_core.filters.DataNodeFilter]",
                         "default_value": "\"*\"",
                         "doc": "TODO: a list of <code>DataNode^</code> attributes to filter on. If False, do not allow filter."
                     },
@@ -367,7 +367,7 @@
                     },
                     {
                         "name": "sort",
-                        "type": "bool|str|DataNodeFilter|list[str|DataNodeFilter]",
+                        "type": "bool|str|taipy.gui_core.filters.DataNodeFilter|list[str|taipy.gui_core.filters.DataNodeFilter]",
                         "default_value": "\"*\"",
                         "doc": "TODO: a list of <code>DataNode^</code> attributes to sort on. If False, do not allow sort."
                     }
@@ -386,6 +386,24 @@
                         "default_property": true,
                         "type": "dynamic(DataNode|list[DataNode])",
                         "doc": "The data node to display and edit.<br/>If the value is a list, it must have a single element otherwise nothing is shown."
+                    },
+                    {
+                        "name": "show_data",
+                        "type": "bool",
+                        "default_value": "True",
+                        "doc": "If False, the data node value tab is not visible."
+                    },
+                    {
+                        "name": "show_properties",
+                        "type": "bool",
+                        "default_value": "True",
+                        "doc": "If False, the data node properties tab is not visible."
+                    },
+                    {
+                        "name": "show_history",
+                        "type": "bool",
+                        "default_value": "True",
+                        "doc": "If False, the data node history tab is not visible."
                     },
                     {
                         "name": "active",
@@ -418,6 +436,18 @@
                         "doc": "If False, the data node owner label is not visible."
                     },
                     {
+                        "name": "show_owner_label",
+                        "type": "bool",
+                        "default_value": "False",
+                        "doc": "If True, the data node owner label is added to the datanode label at the top of the block."
+                    },
+                    {
+                        "name": "show_custom_properties",
+                        "type": "bool",
+                        "default_value": "True",
+                        "doc": "If False, the custom properties for this data node properties are not visible in the Properties tab."
+                    },
+                    {
                         "name": "show_edit_date",
                         "type": "bool",
                         "default_value": "False",
@@ -428,30 +458,6 @@
                         "type": "bool",
                         "default_value": "False",
                         "doc": "If False, the data node expiration date is not visible."
-                    },
-                    {
-                        "name": "show_properties",
-                        "type": "bool",
-                        "default_value": "True",
-                        "doc": "If False, the data node properties are not visible."
-                    },
-                    {
-                        "name": "show_history",
-                        "type": "bool",
-                        "default_value": "True",
-                        "doc": "If False, the data node history is not visible."
-                    },
-                    {
-                        "name": "show_data",
-                        "type": "bool",
-                        "default_value": "True",
-                        "doc": "If False, the data node value is not visible."
-                    },
-                    {
-                        "name": "show_owner_label",
-                        "type": "bool",
-                        "default_value": "False",
-                        "doc": "If True, the data node owner label is added to the datanode label at the top of the block."
                     },
                     {
                         "name": "chart_config",
@@ -548,7 +554,7 @@
                     },
                     {
                         "name": "on_details",
-                        "type": "Union[str, Callback, bool]",
+                        "type": "Union[str, Callable, bool]",
                         "doc": "The name of a function that is triggered when the details icon is pressed.<br/>The parameters of that function are all optional:\n<ul>\n<li>state (<code>State^</code>): the state instance.</li>\n<li>id (str): the id of the control.</li>\n<li>payload (<code>dict</code>): a dictionary that contains the Job Id in the value for key <i>args<i>.</li>\n</ul></br>If False, the icon is not shown.",
                         "signature": [
                             [
@@ -583,7 +589,7 @@
                     {
                         "name": "class_name",
                         "type": "dynamic(str)",
-                        "doc": "The list of CSS class names associated with the generated HTML Element.<br/>These class names will be added to the default <code>taipy_gui_core-&lt;element_type&gt;</code>."
+                        "doc": "The list of CSS class names associated with the generated HTML Element.<br/>These class names will be added to the default <code>taipy_gui_core-[element_type]</code>."
                     }
                 ]
             }
