@@ -40,10 +40,10 @@ No more compromises on performance, customization, and scalability.
 - [What's Taipy?](#%EF%B8%8F-whats-taipy)
 - [Key Features](#-key-features)
 - [Quickstart](#️-quickstart)
-- [Scenario and Data Management](#-scenario-and-data-management)
+- [Scenario and Data Management](#-scenario--data-management)
 - [Taipy Studio](#taipy-studio)
 - [User Interface Generation and Scenario & Data Management](#user-interface-generation-and-scenario--data-management)
-- [Contributing](#-contributing)
+- [Contributing](#%EF%B8%8F-contributing)
 - [Code of Conduct](#-code-of-conduct)
 - [License](#-license)
 

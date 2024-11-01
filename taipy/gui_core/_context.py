@@ -516,7 +516,11 @@ class _GuiCoreContext(CoreEventConsumerBase):
             finally:
                 self.scenario_refresh(scenario_id)
                 if (scenario or user_scenario) and (sel_scenario_var := args[1] if isinstance(args[1], str) else None):
-                    self.gui._update_var(sel_scenario_var, scenario or user_scenario, on_change=args[2])
+                    self.gui._update_var(
+                        sel_scenario_var[6:] if sel_scenario_var.startswith("_TpLv_") else sel_scenario_var,
+                        scenario or user_scenario,
+                        on_change=args[2],
+                    )
         if scenario:
             if not (reason := is_editable(scenario)):
                 state.assign(error_var, f"Scenario {scenario_id or name} is not editable: {_get_reason(reason)}.")
@@ -1124,10 +1128,8 @@ class _GuiCoreContext(CoreEventConsumerBase):
         if id and is_readable(t.cast(DataNodeId, id)) and (dn := core_get(id)) and isinstance(dn, DataNode):
             try:
                 return [
-                        (k, f"{v}")
-                        for k, v in dn._get_user_properties().items()
-                        if k != _GuiCoreContext.__PROP_ENTITY_NAME
-                    ]
+                    (k, f"{v}") for k, v in dn._get_user_properties().items() if k != _GuiCoreContext.__PROP_ENTITY_NAME
+                ]
             except Exception:
                 return None
         return None
