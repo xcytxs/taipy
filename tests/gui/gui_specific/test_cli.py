@@ -125,7 +125,7 @@ def test_upload_folder(gui: Gui):
 def test_client_url(gui: Gui):
     with patch("sys.argv", ["prog"]):
         gui.run(run_server=False)
-        assert gui._config.config.get("client_url") == "http://localhost:{port}"
+        assert gui._config.config.get("client_url") is None
 
 
 def test_client_url_1(gui: Gui):
