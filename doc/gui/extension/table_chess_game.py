@@ -29,4 +29,4 @@ page = """
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game", port=3003)
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game")
