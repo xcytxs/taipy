@@ -30,6 +30,7 @@ from flask import (
     jsonify,
     make_response,
     render_template,
+    render_template_string,
     request,
     send_from_directory,
 )
@@ -169,9 +170,8 @@ class _Server:
             if resource_handler_id is not None:
                 resource_handler = _ExternalResourceHandlerManager().get(resource_handler_id)
                 if resource_handler is None:
-                    response = make_response(
-                        "Cookie was deleted due to invalid resource handler id. Please restart the page manually.", 400
-                    )
+                    reload_html = "<html><head><style>body {background-color: black; margin: 0;}</style></head><body><script>location.reload();</script></body></html>"  # noqa: E501
+                    response = make_response(render_template_string(reload_html), 400)
                     response.set_cookie(
                         _Server._RESOURCE_HANDLER_ARG, "", secure=request.is_secure, httponly=True, expires=0, path="/"
                     )
