@@ -32,12 +32,10 @@ const GameTable = (props: GameTableProps) => {
         const rows: RowType[] = [];
         if (value) {
             Object.entries(value).forEach(([col, colValues]) => {
-                if (colValues) {
-                    colValues.forEach((val: RowValue, idx: number) => {
+                    colValues.forEach((val, idx) => {
                         rows[idx] = rows[idx] || {};
                         rows[idx][col] = val;
                     });
-                }
             });
         }
         return rows;

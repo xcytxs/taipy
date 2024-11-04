@@ -12,7 +12,7 @@ from example_library import ExampleLibrary
 
 from taipy.gui import Gui
 
-chessboard = [
+data = [
     ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
     ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
     ["", "", "", "", "", "", "", ""],
@@ -25,8 +25,8 @@ chessboard = [
 
 page = """
 ## Chess Game
-<|{chessboard}|example.game_table|>
+<|{data}|example.game_table|>
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game")
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game", port=3003)
