@@ -8,8 +8,6 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
-
-import pandas as pd
 from example_library import ExampleLibrary
 
 from taipy.gui import Gui
@@ -25,13 +23,10 @@ chessboard = [
     ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"]
 ]
 
-# Create a DataFrame to represent the chessboard
-data = pd.DataFrame(chessboard, columns=["A", "B", "C", "D", "E", "F", "G", "H"])
-
 page = """
 ## Chess Game
-<|{data}|example.game_table|>
+<|{chessboard}|example.game_table|>
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game", port=3003)
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game")

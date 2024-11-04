@@ -18,22 +18,22 @@ const pageKey = "no-page-key";
 
 const GameTable = (props: GameTableProps) => {
     const { data, updateVarName = "", updateVars = "", id } = props;
-    const [value, setValue] = useState<TableValueType>({});
+    const [value, setValue] = useState<Record<string, Array<RowValue>>>({});
     const dispatch = useDispatch();
     const module = useModule();
     const refresh = data?.__taipy_refresh !== undefined;
     useDispatchRequestUpdateOnFirstRender(dispatch, id, module, updateVars);
 
     const colsOrder = useMemo(() => {
-        return Object.keys(value || {});
+        return Object.keys(value);
     }, [value]);
 
     const rows = useMemo(() => {
         const rows: RowType[] = [];
         if (value) {
-            colsOrder.forEach((col) => {
-                if (value[col]) {
-                    value[col].forEach((val: RowValue, idx: number) => {
+            Object.entries(value).forEach(([col, colValues]) => {
+                if (colValues) {
+                    colValues.forEach((val: RowValue, idx: number) => {
                         rows[idx] = rows[idx] || {};
                         rows[idx][col] = val;
                     });
@@ -41,7 +41,7 @@ const GameTable = (props: GameTableProps) => {
             });
         }
         return rows;
-    }, [value, colsOrder]);
+    }, [value]);
 
     useEffect(() => {
         if (refresh || !data || data[pageKey] === undefined) {
@@ -65,11 +65,6 @@ const GameTable = (props: GameTableProps) => {
     return (
         <div>
             <table border={1} cellPadding={10} cellSpacing={0}>
-                <thead>
-                    {colsOrder.map((col, idx) => (
-                        <th key={col + idx}>{col}</th>
-                    ))}
-                </thead>
                 <tbody>
                     {rows.map((row, index) => (
                         <tr key={"row" + index}>

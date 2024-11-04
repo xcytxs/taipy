@@ -39,7 +39,7 @@ class ExampleLibrary(ElementLibrary):
                     "data": ElementProperty(PropertyType.data),
                 },
                 # The name of the React component (GameTable) that implements this custom
-                # element, exported as BasicTable in front-end/src/index.ts
+                # element, exported as GameTable in front-end/src/index.ts
                 react_component="GameTable",
             ),
         }
