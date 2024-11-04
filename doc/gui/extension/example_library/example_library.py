@@ -33,14 +33,14 @@ class ExampleLibrary(ElementLibrary):
                 # element, exported as ExampleLabel in front-end/src/index.ts
                 react_component="ExampleLabel",
             ),
-            "basic_table": Element(
+            "game_table": Element(
                 "data",
                 {
                     "data": ElementProperty(PropertyType.data),
                 },
-                # The name of the React component (BasicTable) that implements this custom
+                # The name of the React component (GameTable) that implements this custom
                 # element, exported as BasicTable in front-end/src/index.ts
-                react_component="BasicTable",
+                react_component="GameTable",
             ),
         }
 

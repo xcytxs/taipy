@@ -30,7 +30,7 @@ data = pd.DataFrame(chessboard, columns=["A", "B", "C", "D", "E", "F", "G", "H"]
 
 page = """
 ## Chess Game
-<|{data}|example.basic_table|>
+<|{data}|example.game_table|>
 """
 
 if __name__ == "__main__":

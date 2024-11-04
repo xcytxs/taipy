@@ -10,13 +10,13 @@ import {
     RowValue,
 } from "taipy-gui";
 
-interface BasicTableProps extends TaipyDynamicProps {
+interface GameTableProps extends TaipyDynamicProps {
     data: TableValueType;
 }
 
 const pageKey = "no-page-key";
 
-const BasicTable = (props: BasicTableProps) => {
+const GameTable = (props: GameTableProps) => {
     const { data, updateVarName = "", updateVars = "", id } = props;
     const [value, setValue] = useState<TableValueType>({});
     const dispatch = useDispatch();
@@ -84,4 +84,4 @@ const BasicTable = (props: BasicTableProps) => {
     );
 };
 
-export default BasicTable;
+export default GameTable;
