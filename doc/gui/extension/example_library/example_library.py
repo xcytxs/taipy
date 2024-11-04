@@ -40,7 +40,7 @@ class ExampleLibrary(ElementLibrary):
                 },
                 # The name of the React component (GameTable) that implements this custom
                 # element, exported as GameTable in front-end/src/index.ts
-                react_component="GameTable",
+                # react_component="GameTable",
             ),
         }
 
