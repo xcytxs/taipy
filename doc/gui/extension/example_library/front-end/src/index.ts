@@ -7,6 +7,6 @@
 // Note that we export the 'ColoredLabel' component as 'ExampleLabel', which is
 // the name used in the element declaration in the element library.
 import ColoredLabel from "./ColoredLabel";
-import GameTable from "./BasicTable";
+import GameTable from "./GameTable";
 
 export { ColoredLabel as ExampleLabel, GameTable };
