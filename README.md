@@ -1,6 +1,3 @@
-[![Hacktoberfest_clickable](https://github.com/user-attachments/assets/b1b5a430-6df9-40c2-999f-de3433f61251)](https://assorted-son-815.notion.site/Hacktoberfest-2024-with-Taipy-2a5032a3f01642709e88ffaa5d0d169e)
-
-
 <div align="center">
   <a href="https://taipy.io?utm_source=github" target="_blank">
   <picture>
@@ -40,10 +37,10 @@ No more compromises on performance, customization, and scalability.
 - [What's Taipy?](#%EF%B8%8F-whats-taipy)
 - [Key Features](#-key-features)
 - [Quickstart](#️-quickstart)
-- [Scenario and Data Management](#-scenario-and-data-management)
+- [Scenario and Data Management](#-scenario--data-management)
 - [Taipy Studio](#taipy-studio)
 - [User Interface Generation and Scenario & Data Management](#user-interface-generation-and-scenario--data-management)
-- [Contributing](#-contributing)
+- [Contributing](#%EF%B8%8F-contributing)
 - [Code of Conduct](#-code-of-conduct)
 - [License](#-license)
 

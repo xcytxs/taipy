@@ -73,7 +73,7 @@ from .extension.library import Element, ElementLibrary
 from .page import Page
 from .partial import Partial
 from .server import _Server
-from .state import State
+from .state import State, _GuiState
 from .types import _WsType
 from .utils import (
     _delscopeattr,
@@ -1332,12 +1332,8 @@ class Gui:
         )
 
     def __send_ws_alert(
-            self, type: str,
-            message: str,
-            system_notification: bool,
-            duration: int,
-            notification_id: t.Optional[str] = None
-        ) -> None:
+        self, type: str, message: str, system_notification: bool, duration: int, notification_id: t.Optional[str] = None
+    ) -> None:
         payload = {
             "type": _WsType.ALERT.value,
             "atype": type,
@@ -2278,9 +2274,8 @@ class Gui:
                 message="",  # No need for a message when closing
                 system_notification=False,  # System notification not needed for closing
                 duration=0,  # No duration since it's an immediate close
-                notification_id=notification_id
+                notification_id=notification_id,
             )
-
 
     def _hold_actions(
         self,
@@ -2292,7 +2287,9 @@ class Gui:
             if isinstance(callback, str)
             else _get_lambda_id(t.cast(LambdaType, callback))
             if _is_unnamed_function(callback)
-            else callback.__name__ if callback is not None else None
+            else callback.__name__
+            if callback is not None
+            else None
         )
         func = self.__get_on_cancel_block_ui(action_name)
         def_action_name = func.__name__
@@ -2659,13 +2656,13 @@ class Gui:
             s if bool(urlparse(s).netloc) else f"{Gui._EXTENSION_ROOT}/{name}/{s}{lib.get_query(s)}"
             for name, libs in Gui.__extensions.items()
             for lib in libs
-            for s in (lib.get_scripts() or [])
+            for s in (lib._do_get_relative_paths(lib.get_scripts()))
         ]
         styles = [
             s if bool(urlparse(s).netloc) else f"{Gui._EXTENSION_ROOT}/{name}/{s}{lib.get_query(s)}"
             for name, libs in Gui.__extensions.items()
             for lib in libs
-            for s in (lib.get_styles() or [])
+            for s in (lib._do_get_relative_paths(lib.get_styles()))
         ]
         if self._get_config("stylekit", True):
             styles.append("stylekit/stylekit.css")
@@ -2809,7 +2806,9 @@ class Gui:
         self.__var_dir.set_default(self.__frame)
 
         if self.__state is None or is_reloading:
-            self.__state = State(self, self.__locals_context.get_all_keys(), self.__locals_context.get_all_context())
+            self.__state = _GuiState(
+                self, self.__locals_context.get_all_keys(), self.__locals_context.get_all_context()
+            )
 
         if _is_in_notebook():
             # Allow gui.state.x in notebook mode
