@@ -27,7 +27,6 @@ import Popover, { PopoverOrigin } from "@mui/material/Popover";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
-import Switch from "@mui/material/Switch";
 import { DateField, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
@@ -305,14 +304,11 @@ const FilterRow = (props: FilterRowProps) => {
                         slotProps={{
                             input: {
                                 endAdornment: (
-                                    <Switch
-                                        onChange={toggleMatchCase}
-                                        checked={matchCase}
-                                        size="small"
-                                        checkedIcon={<MatchCase />}
-                                        icon={<MatchCase color="disabled" />}
-                                        inputProps={{ "aria-label": "Case Sensitive Toggle" }}
-                                    />
+                                    <Tooltip title={matchCase ? "Case sensitive" : "Case insensitive"}>
+                                        <IconButton onClick={toggleMatchCase} size="small">
+                                            <MatchCase color={matchCase ? "primary" : "disabled"} />
+                                        </IconButton>
+                                    </Tooltip>
                                 ),
                             },
                         }}

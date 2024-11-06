@@ -70,8 +70,8 @@ describe("Table Filter Component", () => {
         expect(getAllByText("Column")).toHaveLength(2);
         expect(getAllByText("Action")).toHaveLength(2);
         expect(getAllByText("Empty String")).toHaveLength(2);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
         expect(getByTestId("CheckIcon").parentElement).toBeDisabled();
         expect(getByTestId("DeleteIcon").parentElement).toBeDisabled();
     });
@@ -81,12 +81,12 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
-        await userEvent.click(dropdownElts[0].parentElement?.firstElementChild || dropdownElts[0]);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
+        await userEvent.click(dropdownElements[0].parentElement?.firstElementChild || dropdownElements[0]);
         await findByRole("listbox");
         await userEvent.click(getByText("StringCol"));
-        await userEvent.click(dropdownElts[1].parentElement?.firstElementChild || dropdownElts[1]);
+        await userEvent.click(dropdownElements[1].parentElement?.firstElementChild || dropdownElements[1]);
         await findByRole("listbox");
         await userEvent.click(getByText("contains"));
         const validate = getByTestId("CheckIcon").parentElement;
@@ -98,12 +98,12 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
-        await userEvent.click(dropdownElts[0].parentElement?.firstElementChild || dropdownElts[0]);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
+        await userEvent.click(dropdownElements[0].parentElement?.firstElementChild || dropdownElements[0]);
         await findByRole("listbox");
         await userEvent.click(getByText("NumberCol"));
-        await userEvent.click(dropdownElts[1].parentElement?.firstElementChild || dropdownElts[1]);
+        await userEvent.click(dropdownElements[1].parentElement?.firstElementChild || dropdownElements[1]);
         await findByRole("listbox");
         await userEvent.click(getByText("less equals"));
         const validate = getByTestId("CheckIcon").parentElement;
@@ -121,19 +121,19 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
-        await userEvent.click(dropdownElts[0].parentElement?.firstElementChild || dropdownElts[0]);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
+        await userEvent.click(dropdownElements[0].parentElement?.firstElementChild || dropdownElements[0]);
         await findByRole("listbox");
         await userEvent.click(getByText("BoolCol"));
-        await userEvent.click(dropdownElts[1].parentElement?.firstElementChild || dropdownElts[1]);
+        await userEvent.click(dropdownElements[1].parentElement?.firstElementChild || dropdownElements[1]);
         await findByRole("listbox");
         await userEvent.click(getByText("equals"));
         const validate = getByTestId("CheckIcon").parentElement;
         expect(validate).toBeDisabled();
-        const dddElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dddElts).toHaveLength(3);
-        await userEvent.click(dddElts[2].parentElement?.firstElementChild || dddElts[0]);
+        const dddElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dddElements).toHaveLength(3);
+        await userEvent.click(dddElements[2].parentElement?.firstElementChild || dddElements[0]);
         await findByRole("listbox");
         expect(validate).toBeDisabled();
         await userEvent.click(getByText("True"));
@@ -145,12 +145,12 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
-        await userEvent.click(dropdownElts[0].parentElement?.firstElementChild || dropdownElts[0]);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
+        await userEvent.click(dropdownElements[0].parentElement?.firstElementChild || dropdownElements[0]);
         await findByRole("listbox");
         await userEvent.click(getByText("DateCol"));
-        await userEvent.click(dropdownElts[1].parentElement?.firstElementChild || dropdownElts[1]);
+        await userEvent.click(dropdownElements[1].parentElement?.firstElementChild || dropdownElements[1]);
         await findByRole("listbox");
         await userEvent.click(getByText("before equal"));
         const validate = getByTestId("CheckIcon").parentElement;
@@ -166,19 +166,19 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
-        await userEvent.click(dropdownElts[0].parentElement?.firstElementChild || dropdownElts[0]);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
+        await userEvent.click(dropdownElements[0].parentElement?.firstElementChild || dropdownElements[0]);
         await findByRole("listbox");
         await userEvent.click(getByText("StringCol"));
-        await userEvent.click(dropdownElts[1].parentElement?.firstElementChild || dropdownElts[1]);
+        await userEvent.click(dropdownElements[1].parentElement?.firstElementChild || dropdownElements[1]);
         await findByRole("listbox");
         await userEvent.click(getByText("contains"));
         const validate = getByTestId("CheckIcon");
         expect(validate.parentElement).not.toBeDisabled();
         await userEvent.click(validate);
-        const ddElts = getAllByTestId("ArrowDropDownIcon");
-        expect(ddElts).toHaveLength(4);
+        const ddElements = getAllByTestId("ArrowDropDownIcon");
+        expect(ddElements).toHaveLength(4);
         getByText("1");
         expect(onValidate).toHaveBeenCalled();
     });
@@ -189,26 +189,26 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const dropdownElts = getAllByTestId("ArrowDropDownIcon");
-        expect(dropdownElts).toHaveLength(2);
-        await userEvent.click(dropdownElts[0].parentElement?.firstElementChild || dropdownElts[0]);
+        const dropdownElements = getAllByTestId("ArrowDropDownIcon");
+        expect(dropdownElements).toHaveLength(2);
+        await userEvent.click(dropdownElements[0].parentElement?.firstElementChild || dropdownElements[0]);
         await findByRole("listbox");
         await userEvent.click(getByText("StringCol"));
-        await userEvent.click(dropdownElts[1].parentElement?.firstElementChild || dropdownElts[1]);
+        await userEvent.click(dropdownElements[1].parentElement?.firstElementChild || dropdownElements[1]);
         await findByRole("listbox");
         await userEvent.click(getByText("contains"));
         const validate = getByTestId("CheckIcon");
         expect(validate.parentElement).not.toBeDisabled();
         await userEvent.click(validate);
-        const ddElts = getAllByTestId("ArrowDropDownIcon");
-        expect(ddElts).toHaveLength(4);
+        const ddElements = getAllByTestId("ArrowDropDownIcon");
+        expect(ddElements).toHaveLength(4);
         const deletes = getAllByTestId("DeleteIcon");
         expect(deletes).toHaveLength(2);
         expect(deletes[0].parentElement).not.toBeDisabled();
         expect(deletes[1].parentElement).toBeDisabled();
         await userEvent.click(deletes[0]);
-        const ddElts2 = getAllByTestId("ArrowDropDownIcon");
-        expect(ddElts2).toHaveLength(2);
+        const ddElements2 = getAllByTestId("ArrowDropDownIcon");
+        expect(ddElements2).toHaveLength(2);
     });
     it("reset filters", async () => {
         const onValidate = jest.fn();
@@ -242,13 +242,13 @@ describe("Table Filter Component", () => {
         );
         const elt = getByTestId("FilterListIcon");
         await userEvent.click(elt);
-        const ddElts2 = getAllByTestId("ArrowDropDownIcon");
-        expect(ddElts2).toHaveLength(2);
+        const ddElements2 = getAllByTestId("ArrowDropDownIcon");
+        expect(ddElements2).toHaveLength(2);
     });
 });
 describe("Table Filter Component - Case Insensitive Test", () => {
-    it("renders the case sensitivity toggle switch", async () => {
-        const { getByTestId, getAllByTestId, findByRole, getByText, getAllByText } = render(
+    it("renders the case sensitivity button", async () => {
+        const { getByTestId, getAllByTestId, findByRole, getByText, getByRole } = render(
             <TableFilter columns={tableColumns} colsOrder={colsOrder} onValidate={jest.fn()} filteredCount={0} />
         );
 
@@ -262,29 +262,9 @@ describe("Table Filter Component - Case Insensitive Test", () => {
         await findByRole("listbox");
         await userEvent.click(getByText("StringCol"));
 
-        // Select 'contains' filter action
-        await userEvent.click(dropdownIcons[1].parentElement?.firstElementChild || dropdownIcons[1]);
-        await findByRole("listbox");
-        await userEvent.click(getByText("contains"));
-
         // Check for the case-sensitive toggle and interact with it
-        const caseSensitiveToggle = screen.getByRole("checkbox", { name: /case sensitive toggle/i });
-        expect(caseSensitiveToggle).toBeInTheDocument(); // Ensure the toggle is rendered
-        await userEvent.click(caseSensitiveToggle); // Toggle case sensitivity off
-
-        // Input some test text and validate case insensitivity
-        const inputs = getAllByText("Empty String");
-        const inputField = inputs[0].nextElementSibling?.firstElementChild || inputs[0];
-        await userEvent.click(inputField);
-        await userEvent.type(inputField, "CASETEST");
-
-        // Ensure the validate button is enabled
-        const validateButton = getByTestId("CheckIcon").parentElement;
-        expect(validateButton).not.toBeDisabled();
-
-        // Test case-insensitivity by changing input case
-        await userEvent.clear(inputField);
-        await userEvent.type(inputField, "casetest");
-        expect(validateButton).not.toBeDisabled();
+        const caseButton = getByRole("button", { name: /case insensitive/i });
+        expect(caseButton).toBeInTheDocument(); // Ensure the button is rendered
+        await userEvent.click(caseButton); // change case sensitivity
     });
 });
