@@ -10,7 +10,7 @@
 # specific language governing permissions and limitations under the License.
 
 import functools
-from typing import Dict
+from typing import Dict, Type
 
 from .._manager._manager import _Manager
 from ..common._check_dependencies import EnterpriseEditionUtils
@@ -24,7 +24,7 @@ class _Reloader:
     _instance = None
     _no_reload_context = False
 
-    _managers: Dict[str, _Manager] = {}
+    _managers: Dict[str, Type[_Manager]] = {}
 
     def __new__(cls, *args, **kwargs):
         if not isinstance(cls._instance, cls):
@@ -54,7 +54,7 @@ class _Reloader:
 
     @classmethod
     @functools.lru_cache
-    def _build_managers(cls) -> Dict[str, _Manager]:
+    def _build_managers(cls) -> Dict[str, Type[_Manager]]:
         from ..cycle._cycle_manager_factory import _CycleManagerFactory
         from ..data._data_manager_factory import _DataManagerFactory
         from ..job._job_manager_factory import _JobManagerFactory
@@ -63,7 +63,7 @@ class _Reloader:
         from ..submission._submission_manager_factory import _SubmissionManagerFactory
         from ..task._task_manager_factory import _TaskManagerFactory
 
-        managers = {
+        managers: Dict[str, Type[_Manager]] = {
             "scenario": _ScenarioManagerFactory._build_manager(),
             "sequence": _SequenceManagerFactory._build_manager(),
             "data": _DataManagerFactory._build_manager(),
@@ -83,7 +83,7 @@ class _Reloader:
 
     @classmethod
     @functools.lru_cache
-    def _get_manager(cls, manager: str) -> _Manager:
+    def _get_manager(cls, manager: str) -> Type[_Manager]:
         return cls._managers[manager]
 
 
