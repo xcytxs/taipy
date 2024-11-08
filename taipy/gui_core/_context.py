@@ -284,10 +284,18 @@ class _GuiCoreContext(CoreEventConsumerBase):
         return None
 
     def filter_entities(
-        self, cycle_scenario: t.List, col: str, col_type: str, is_dn: bool, action: str, val: t.Any, col_fn=None
+        self,
+        cycle_scenario: t.List,
+        col: str,
+        col_type: str,
+        is_dn: bool,
+        action: str,
+        val: t.Any,
+        col_fn=None,
+        match_case: bool = False,
     ):
         cycle_scenario[2] = [
-            e for e in cycle_scenario[2] if _invoke_action(e, col, col_type, is_dn, action, val, col_fn)
+            e for e in cycle_scenario[2] if _invoke_action(e, col, col_type, is_dn, action, val, col_fn, match_case)
         ]
         return cycle_scenario
 
@@ -326,6 +334,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
             col_fn = cp[0] if (cp := col.split("(")) and len(cp) > 1 else None
             val = fd.get("value")
             action = fd.get("action", "")
+            match_case = fd.get("matchCase", False) is not False
             customs = CustomScenarioFilter._get_custom(col)
             if customs:
                 with self.gui._set_locals_context(customs[0] or None):
@@ -344,14 +353,14 @@ class _GuiCoreContext(CoreEventConsumerBase):
                 e
                 for e in filtered_list
                 if not isinstance(e, Scenario)
-                or _invoke_action(e, t.cast(str, col), col_type, is_datanode_prop, action, val, col_fn)
+                or _invoke_action(e, t.cast(str, col), col_type, is_datanode_prop, action, val, col_fn, match_case)
             ]
             # level 2 filtering
             filtered_list = [
                 e
                 if isinstance(e, Scenario)
                 else self.filter_entities(
-                    t.cast(list, e), t.cast(str, col), col_type, is_datanode_prop, action, val, col_fn
+                    t.cast(list, e), t.cast(str, col), col_type, is_datanode_prop, action, val, col_fn, match_case
                 )
                 for e in filtered_list
             ]
@@ -649,6 +658,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
             col_fn = cp[0] if (cp := col.split("(")) and len(cp) > 1 else None
             val = fd.get("value")
             action = fd.get("action", "")
+            match_case = fd.get("matchCase", False) is not False
             customs = CustomScenarioFilter._get_custom(col)
             if customs:
                 with self.gui._set_locals_context(customs[0] or None):
@@ -666,15 +676,17 @@ class _GuiCoreContext(CoreEventConsumerBase):
                 e
                 for e in filtered_list
                 if not isinstance(e, DataNode)
-                or _invoke_action(e, t.cast(str, col), col_type, False, action, val, col_fn)
+                or _invoke_action(e, t.cast(str, col), col_type, False, action, val, col_fn, match_case)
             ]
             # level 3 filtering
             filtered_list = [
                 e
                 if isinstance(e, DataNode)
-                else self.filter_entities(d, t.cast(str, col), col_type, False, action, val, col_fn)
+                else self.filter_entities(
+                    t.cast(list, d), t.cast(str, col), col_type, False, action, val, col_fn, match_case
+                )
                 for e in filtered_list
-                for d in t.cast(list, t.cast(list, e)[2])
+                for d in (t.cast(list, t.cast(list, e)[2]) if isinstance(e, list) else [e])
             ]
         # remove empty cycles
         return [e for e in filtered_list if isinstance(e, DataNode) or (isinstance(e, (tuple, list)) and len(e[2]))]

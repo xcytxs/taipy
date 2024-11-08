@@ -278,14 +278,20 @@ _operators: t.Dict[str, t.Callable] = {
 }
 
 
-def _filter_value(base_val: t.Any, operator: t.Callable, val: t.Any, adapt: t.Optional[t.Callable] = None):
+def _filter_value(
+    base_val: t.Any,
+    operator: t.Callable,
+    val: t.Any,
+    adapt: t.Optional[t.Callable] = None,
+    match_case: bool = False,
+):
     if base_val is None:
         base_val = "" if isinstance(val, str) else 0
     else:
         if isinstance(base_val, (datetime, date)):
             base_val = base_val.isoformat()
         val = adapt(base_val, val) if adapt else val
-        if isinstance(base_val, str) and isinstance(val, str):
+        if not match_case and isinstance(base_val, str) and isinstance(val, str):
             base_val = base_val.lower()
             val = val.lower()
     return operator(base_val, val)
@@ -305,7 +311,7 @@ def _adapt_type(base_val, val):
     return val
 
 
-def _filter_iterable(list_val: Iterable, operator: t.Callable, val: t.Any):
+def _filter_iterable(list_val: Iterable, operator: t.Callable, val: t.Any, match_case: bool = False):
     if operator is contains:
         types = {type(v) for v in list_val}
         if len(types) == 1:
@@ -315,11 +321,18 @@ def _filter_iterable(list_val: Iterable, operator: t.Callable, val: t.Any):
             else:
                 val = _adapt_type(typed_val, val)
         return contains(list(list_val), val)
-    return next(filter(lambda v: _filter_value(v, operator, val), list_val), None) is not None
+    return next(filter(lambda v: _filter_value(v, operator, val, match_case=match_case), list_val), None) is not None
 
 
 def _invoke_action(
-    ent: t.Any, col: str, col_type: str, is_dn: bool, action: str, val: t.Any, col_fn: t.Optional[str]
+    ent: t.Any,
+    col: str,
+    col_type: str,
+    is_dn: bool,
+    action: str,
+    val: t.Any,
+    col_fn: t.Optional[str] = None,
+    match_case: bool = False,
 ) -> bool:
     if ent is None:
         return False
@@ -337,8 +350,8 @@ def _invoke_action(
             if isinstance(cur_val, DataNode):
                 cur_val = cur_val.read()
             if not isinstance(cur_val, str) and isinstance(cur_val, Iterable):
-                return _filter_iterable(cur_val, op, val)
-            return _filter_value(cur_val, op, val, _adapt_type)
+                return _filter_iterable(cur_val, op, val, match_case)
+            return _filter_value(cur_val, op, val, _adapt_type, match_case)
     except Exception as e:
         if _is_debugging():
             _warn(f"Error filtering with {col} {action} {val} on {ent}.", e)
