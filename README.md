@@ -68,16 +68,6 @@ No more compromises on performance, customization, and scalability.
      <strong> Go beyond existing libraries  </strong>
 </div>
 
-<p align="center"><h4>
-    <br />
-    <a href="https://docs.taipy.io/en/latest/"><strong>📚 Explore the Docs </strong></a>
-    <br />
-    <a href="https://discord.com/invite/SJyz2VJGxV"><strong>  🫱🏼‍🫲🏼 Discord Support </strong></a>
-    <br />
-    <a href="https://docs.taipy.io/en/latest/gallery/"><strong> 👀 Demos & Examples </strong></a>
-</h4>
-  </p>
-
   ## Table of Contents
 
 - [What's Taipy?](#%EF%B8%8F-whats-taipy)
