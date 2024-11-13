@@ -1228,6 +1228,12 @@
                         "doc": "If set to True, multiple files can be uploaded."
                     },
                     {
+                        "name": "selection_type",
+                        "type": "str",
+                        "default_value": "\"file\"",
+                        "doc": "Can be set to \"file\" (with \"f\", \"\" aliases) or \"directory\" (with \"d\", \"dir\", \"folder\" aliases) to upload the respective element with preserved inner structure."
+                    },
+                    {
                         "name": "extensions",
                         "type": "str",
                         "default_value": "\".csv,.xlsx\"",
