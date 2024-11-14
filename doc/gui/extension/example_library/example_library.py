@@ -42,6 +42,15 @@ class ExampleLibrary(ElementLibrary):
                 # element, exported as GameTable in front-end/src/index.ts
                 # react_component="GameTable",
             ),
+            "list_of_languages": Element(
+                "lov",
+                {
+                    "lov": ElementProperty(PropertyType.lov),
+                },
+                # The name of the React component (TodoList) that implements this custom
+                # element, exported as TodoList in front-end/src/index.ts
+                # react_component="ListOfLanguages",
+            )
         }
 
     # The implementation of the rendering for the "fraction" static element
