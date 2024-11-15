@@ -37,4 +37,3 @@ class _Entity:
 
         for event in self._in_context_attributes_changed_collector:
             Notifier.publish(event)
-        _Reloader._get_manager(self._MANAGER_NAME)._set(self)
