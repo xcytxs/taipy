@@ -10,25 +10,20 @@
 # specific language governing permissions and limitations under the License.
 from example_library import ExampleLibrary
 
-from taipy.gui import Gui
+from taipy.gui import Gui, Icon
 
 languages = [
-    "Python",
-    "JavaScript",
-    "TypeScript",
-    "Java",
-    "C++",
-    "Ruby",
-    "Go",
-    "Swift",
-    "Kotlin",
-    "Rust",
+    ["Python", Icon("./python.png", "Python logo")],
+    ["JavaScript", Icon("./javascript.png", "JavaScript logo")],
+    ["TypeScript", Icon("./typescript.png", "TypeScript logo")],
+    ["Java", Icon("./java.png", "Java logo")],
+    ["C++", Icon("./cpp.png", "C++ logo")],
 ]
 
 page = """
-Please select the programming languages you are familiar with:
-<|{languages}|example.list_of_languages|>
+The list of programming languages is as follows:
+<|{languages}|example.list_item|sort=asc|>
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Programming language selection")
+    Gui(page, libraries=[ExampleLibrary()]).run(title="List of item")
