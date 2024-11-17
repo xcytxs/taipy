@@ -99,6 +99,8 @@ class _Factory:
                 ("active", PropertyType.dynamic_boolean, True),
                 ("hover_text", PropertyType.dynamic_string),
                 ("width", PropertyType.string_or_number),
+                ("size", PropertyType.string),
+                ("variant", PropertyType.string),
             ]
         ),
         "chat": lambda gui, control_type, attrs: _Builder(
