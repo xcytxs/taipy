@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { LoV, useLovListMemo } from "taipy-gui";
 
-interface ToDoListProps {
+interface ItemListProps {
     lov?: LoV;
     defaultLov?: string;
     sort?: "asc" | "desc";
@@ -12,14 +12,14 @@ const styles = {
         display: "flex",
         alignItems: "center",
     },
-    listItemImage: {
+    image: {
         marginRight: "8px",
         width: "1em",
         height: "1em",
     },
 };
 
-const ListItem: React.FC<ToDoListProps> = ({ lov, defaultLov = "", sort }) => {
+const ItemList: React.FC<ItemListProps> = ({ lov, defaultLov = "", sort }) => {
     const lovList = useLovListMemo(lov, defaultLov);
 
     const sortedLovList = useMemo(() => {
@@ -37,7 +37,7 @@ const ListItem: React.FC<ToDoListProps> = ({ lov, defaultLov = "", sort }) => {
                 {sortedLovList.map((todo, index) => (
                     <li key={index} style={styles.listItem}>
                         {typeof todo.item === "string" ? null : (
-                            <img src={todo.item.path} alt={todo.item.text} style={styles.listItemImage} />
+                            <img src={todo.item.path} alt={todo.item.text} style={styles.image} />
                         )}
                         {todo.id}
                     </li>
@@ -47,4 +47,4 @@ const ListItem: React.FC<ToDoListProps> = ({ lov, defaultLov = "", sort }) => {
     );
 };
 
-export default ListItem;
+export default ItemList;

@@ -13,16 +13,16 @@ from example_library import ExampleLibrary
 from taipy.gui import Gui, Icon
 
 languages = [
-    ["Python", Icon("./python.png", "Python logo")],
-    ["JavaScript", Icon("./javascript.png", "JavaScript logo")],
-    ["TypeScript", Icon("./typescript.png", "TypeScript logo")],
-    ["Java", Icon("./java.png", "Java logo")],
-    ["C++", Icon("./cpp.png", "C++ logo")],
+    ["Python", Icon("images/python.png", "Python logo")],
+    ["JavaScript", Icon("images/javascript.png", "JavaScript logo")],
+    ["TypeScript", Icon("images/typescript.png", "TypeScript logo")],
+    ["Java", Icon("images/java.png", "Java logo")],
+    ["C++", Icon("images/cpp.png", "C++ logo")],
 ]
 
 page = """
 The list of programming languages is as follows:
-<|{languages}|example.list_item|sort=asc|>
+<|{languages}|example.item_list|sort=asc|>
 """
 
 if __name__ == "__main__":

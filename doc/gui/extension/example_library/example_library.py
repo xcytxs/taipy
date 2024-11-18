@@ -42,15 +42,15 @@ class ExampleLibrary(ElementLibrary):
                 # element, exported as GameTable in front-end/src/index.ts
                 # react_component="GameTable",
             ),
-            "list_item": Element(
+            "item_list": Element(
                 "lov",
                 {
                     "lov": ElementProperty(PropertyType.lov),
                     "sort": ElementProperty(PropertyType.string),
                 },
-                # The name of the React component (TodoList) that implements this custom
-                # element, exported as TodoList in front-end/src/index.ts
-                # react_component="ListItem",
+                # The name of the React component (ItemList) that implements this custom
+                # element, exported as ItemList in front-end/src/index.ts
+                # react_component="ItemList",
             )
         }
 
