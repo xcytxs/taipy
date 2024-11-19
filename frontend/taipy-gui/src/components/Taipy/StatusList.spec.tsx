@@ -105,4 +105,29 @@ describe("StatusList Component", () => {
         expect(elt).toBeInTheDocument();
         consoleSpy.mockRestore();
     });
+    it("renders default content when content is not provided", () => {
+        const statuses = [
+            { status: "info", message: "Information" },
+            { status: "warning", message: "Warning" },
+        ];
+    
+        const { getByText } = render(<StatusList value={statuses} />);
+        getByText("W");
+    });
+    it("renders custom content passed via 'customIcon' prop", () => {
+        const statuses = [
+            { status: "info", message: "Information" },
+            { status: "warning", message: "Warning" },
+        ];
+    
+        const content = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><circle cx='8' cy='8' r='8' fill='red'/></svg>"
+    
+        const { container } = render(<StatusList value={statuses} customIcon={content} />);
+
+    
+        // Check if the SVG is rendered for the warning status
+        const svg = container.querySelector("svg");
+        expect(svg).toBeInTheDocument();
+    });
+    
 });

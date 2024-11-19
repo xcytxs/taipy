@@ -87,6 +87,8 @@ interface StatusListProps extends TaipyBaseProps, TaipyHoverProps {
     value: Array<[string, string] | StatusType> | [string, string] | StatusType;
     defaultValue?: string;
     withoutClose?: boolean;
+    withIcons?: boolean; 
+    customIcon?: string;
 }
 
 const StatusList = (props: StatusListProps) => {
@@ -95,6 +97,16 @@ const StatusList = (props: StatusListProps) => {
     const [opened, setOpened] = useState(false);
     const [multiple, setMultiple] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const content = useMemo(() => {
+        if (typeof props.customIcon === 'string') {
+            try {
+                return props.customIcon.split(';');
+            } catch (e) {
+                console.info(`Error parsing custom icons\n${(e as Error).message || e}`);
+            }
+        }
+        return [];
+    }, [props.customIcon]);
 
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
     const hover = useDynamicProperty(props.hoverText, props.defaultHoverText, undefined);
@@ -156,10 +168,11 @@ const StatusList = (props: StatusListProps) => {
         [multiple, opened, onOpen]
     );
 
+
     return (
         <Tooltip title={hover || ""}>
             <>
-                <Status id={props.id} value={getGlobalStatus(values)} className={`${className} ${getComponentClassName(props.children)}`} {...globalProps} />
+                <Status id={props.id} value={getGlobalStatus(values)} className={`${className} ${getComponentClassName(props.children)}`} {...globalProps} withIcons={props.withIcons} content={content[0]}/>
                 <Popover open={opened} anchorEl={anchorEl} onClose={onOpen} anchorOrigin={ORIGIN}>
                     <Stack direction="column" spacing={1}>
                         {values
@@ -173,6 +186,8 @@ const StatusList = (props: StatusListProps) => {
                                         value={val}
                                         className={`${className} ${getComponentClassName(props.children)}`}
                                         {...closeProp}
+                                        withIcons={props.withIcons}
+                                        content={content[idx+1] || content[0] || ''}
                                     />
                                 );
                             })}
