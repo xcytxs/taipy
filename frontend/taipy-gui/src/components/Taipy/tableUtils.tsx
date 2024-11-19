@@ -565,7 +565,7 @@ export const EditableCell = (props: EditableCellProps) => {
                 {edit ? (
                     colDesc.type?.startsWith("bool") ? (
                         <Box sx={cellBoxSx}>
-                            lightBool ? (
+                            {useCheckbox ? (
                             <input
                                 type="checkbox"
                                 checked={val as boolean}
@@ -585,7 +585,7 @@ export const EditableCell = (props: EditableCellProps) => {
                                 inputRef={setInputFocus}
                                 className={getSuffixedClassNames(tableClassName, "-bool")}
                             />
-                            )
+                            )}
                             <Box sx={iconsWrapperSx}>
                                 <IconButton onClick={onCheckClick} size="small" sx={iconInRowSx}>
                                     <CheckIcon fontSize="inherit" />
@@ -741,6 +741,7 @@ export const EditableCell = (props: EditableCellProps) => {
                                     checked={value as boolean}
                                     title={boolTitle}
                                     style={defaultCursor}
+                                    readOnly
                                     className={getSuffixedClassNames(tableClassName, "-bool")}
                                 />
                             ) : (
