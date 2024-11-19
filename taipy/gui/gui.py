@@ -174,6 +174,9 @@ class Gui:
 
     __content_providers: t.Dict[type, t.Callable[..., str]] = {}
 
+    # See set_unsupported_data_converter()
+    __unsupported_data_converter: t.Optional[t.Callable] = None
+
     def __init__(
         self,
         page: t.Optional[t.Union[str, Page]] = None,
@@ -447,7 +450,6 @@ class Gui:
         Arguments:
             content_type: The type of the content that triggers the content provider.
             content_provider: The function that converts content of type *type* into an HTML string.
-
         """  # noqa: E501
         if Gui.__content_providers.get(content_type):
             _warn(f"The type {content_type} is already associated with a provider.")
@@ -1015,17 +1017,17 @@ class Gui:
                 complete = part == total - 1
 
         # Extract upload path (when single file is selected, path="" does not change the path)
-        upload_root = os.path.abspath( self._get_config( "upload_folder", tempfile.gettempdir() ) )
-        upload_path = os.path.abspath( os.path.join( upload_root, os.path.dirname(path) ) )
-        if upload_path.startswith( upload_root ):
-            upload_path = Path( upload_path ).resolve()
-            os.makedirs( upload_path, exist_ok=True )
+        upload_root = os.path.abspath(self._get_config("upload_folder", tempfile.gettempdir()))
+        upload_path = os.path.abspath(os.path.join(upload_root, os.path.dirname(path)))
+        if upload_path.startswith(upload_root):
+            upload_path = Path(upload_path).resolve()
+            os.makedirs(upload_path, exist_ok=True)
             # Save file into upload_path directory
             file_path = _get_non_existent_file_path(upload_path, secure_filename(file.filename))
-            file.save( os.path.join( upload_path, (file_path.name + suffix) ) )
+            file.save(os.path.join(upload_path, (file_path.name + suffix)))
         else:
             _warn(f"upload files: Path {path} points outside of upload root.")
-            return("upload files: Path part points outside of upload root.", 400)
+            return ("upload files: Path part points outside of upload root.", 400)
 
         if complete:
             if part > 0:
@@ -1061,9 +1063,7 @@ class Gui:
                     if not _is_function(file_fn):
                         file_fn = _getscopeattr(self, on_upload_action)
                     if _is_function(file_fn):
-                        self._call_function_with_state(
-                            t.cast(t.Callable, file_fn), ["file_upload", {"args": [data]}]
-                        )
+                        self._call_function_with_state(t.cast(t.Callable, file_fn), ["file_upload", {"args": [data]}])
                 else:
                     setattr(self._bindings(), var_name, newvalue)
         return ("", 200)
@@ -1142,6 +1142,41 @@ class Gui:
         if isinstance(state_context, dict):
             for var, val in state_context.items():
                 self._update_var(var, val, True, forward=False)
+
+
+    @staticmethod
+    def set_unsupported_data_converter(converter: t.Optional[t.Callable[[t.Any], t.Any]]) -> None:
+        """Set a custom converter for unsupported data types.
+
+        This function allows specifying a custom conversion function for data types that cannot
+        be serialized automatically. When Taipy GUI encounters an unsupported type in the data
+        being serialized, it will invoke the provided *converter* function. The returned value
+        from this function will then be serialized if possible.
+
+        Arguments:
+            converter: A function that converts a value with an unsupported data type (the only
+              parameter to the function) into data with a supported data type (the returned value
+              from the function).</br>
+              If set to `None`, it removes any existing converter.
+        """
+        Gui.__unsupported_data_converter = converter
+
+    @staticmethod
+    def _convert_unsupported_data(value: t.Any) -> t.Optional[t.Any]:
+        """
+        Handles unsupported data by invoking the converter if there is one.
+
+        Arguments:
+            value: The unsupported data encountered.
+
+        Returns:
+            The transformed data or None if no transformation is possible.
+        """
+        try:
+            return Gui.__unsupported_data_converter(value) if _is_function(Gui.__unsupported_data_converter) else None  # type: ignore
+        except Exception as e:
+            _warn(f"Error transforming data: {str(e)}")
+            return None
 
     def __request_data_update(self, var_name: str, payload: t.Any) -> None:
         # Use custom attrgetter function to allow value binding for _MapDict
