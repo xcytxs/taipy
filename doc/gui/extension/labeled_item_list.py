@@ -21,8 +21,7 @@ languages = [
 ]
 
 page = """
-The list of programming languages is as follows:
-<|{languages}|example.item_list|sort=asc|>
+<|{languages}|example.labeled_item_list|sort=asc|>
 """
 
 if __name__ == "__main__":
