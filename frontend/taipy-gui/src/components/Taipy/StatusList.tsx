@@ -26,26 +26,26 @@ import { getComponentClassName } from "./TaipyStyle";
 export const getStatusIntValue = (status: string) => {
     status = status.toLowerCase();
     if (status.startsWith("i")) {
-        return 1;
+        return 0;
     } else if (status.startsWith("s")) {
-        return 2;
+        return 1;
     } else if (status.startsWith("w")) {
-        return 3;
+        return 2;
     } else if (status.startsWith("e")) {
-        return 4;
+        return 3;
     }
-    return 0;
+    return -1;
 };
 
 export const getStatusStrValue = (status: number) => {
     switch (status) {
-        case 1:
+        case 0:
             return "info";
-        case 2:
+        case 1:
             return "success";
-        case 3:
+        case 2:
             return "warning";
-        case 4:
+        case 3:
             return "error";
         default:
             return "unknown";
@@ -73,6 +73,8 @@ const getGlobalStatus = (values: StatusDel[]) => {
 
 const statusEqual = (v1: StatusDel, v2: StatusDel) => v1.status === v2.status && v1.message === v2.message;
 
+const getIcon = (icons: Array<boolean|string>, index: number) => index >= 0 && index < icons.length ? icons[index] : false;
+
 const ORIGIN = {
     vertical: "bottom",
     horizontal: "left",
@@ -87,8 +89,7 @@ interface StatusListProps extends TaipyBaseProps, TaipyHoverProps {
     value: Array<[string, string] | StatusType> | [string, string] | StatusType;
     defaultValue?: string;
     withoutClose?: boolean;
-    withIcons?: boolean; 
-    customIcon?: string;
+    useIcon?: boolean | string;
 }
 
 const StatusList = (props: StatusListProps) => {
@@ -97,19 +98,31 @@ const StatusList = (props: StatusListProps) => {
     const [opened, setOpened] = useState(false);
     const [multiple, setMultiple] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-    const content = useMemo(() => {
-        if (typeof props.customIcon === 'string') {
-            try {
-                return props.customIcon.split(';');
-            } catch (e) {
-                console.info(`Error parsing custom icons\n${(e as Error).message || e}`);
-            }
-        }
-        return [];
-    }, [props.customIcon]);
 
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
     const hover = useDynamicProperty(props.hoverText, props.defaultHoverText, undefined);
+
+    const icons = useMemo(() => {
+        if (typeof props.useIcon === "string") {
+            try {
+                const iconsDict = JSON.parse(props.useIcon);
+                const defaultVal = iconsDict.__default !== undefined ? iconsDict.__default : false;
+                const res = [defaultVal, defaultVal, defaultVal, defaultVal];
+                Object.entries(iconsDict).forEach(([k, v]) => {
+                    const idx = getStatusIntValue(k);
+                    if (idx >=0) {
+                        res[idx] = v;
+                    }
+                });
+                return res;
+            } catch (e) {
+                console.info(`Error parsing icons\n${(e as Error).message || e}`);
+            }
+            return [false, false, false, false];
+        }
+        return [!!props.useIcon, !!props.useIcon, !!props.useIcon, !!props.useIcon];
+
+    }, [props.useIcon]);
 
     useEffect(() => {
         let val;
@@ -141,8 +154,8 @@ const StatusList = (props: StatusListProps) => {
     }, [value, defaultValue]);
 
     const onClose = useCallback((val: StatusDel) => {
-        setValues((vals) => {
-            const res = vals.map((v) => {
+        setValues((values) => {
+            const res = values.map((v) => {
                 if (!v.hidden && statusEqual(v, val)) {
                     v.hidden = !v.hidden;
                 }
@@ -164,15 +177,22 @@ const StatusList = (props: StatusListProps) => {
     }, []);
 
     const globalProps = useMemo(
-        () => (multiple ? { onClose: onOpen, icon: opened ? <ArrowUpward /> : <ArrowDownward /> } : {}),
+        () => (multiple ? { onClose: onOpen, openedIcon: opened ? <ArrowUpward /> : <ArrowDownward /> } : {}),
         [multiple, opened, onOpen]
     );
 
+    const globStatus = getGlobalStatus(values);
 
     return (
         <Tooltip title={hover || ""}>
             <>
-                <Status id={props.id} value={getGlobalStatus(values)} className={`${className} ${getComponentClassName(props.children)}`} {...globalProps} withIcons={props.withIcons} content={content[0]}/>
+                <Status
+                    id={props.id}
+                    value={globStatus}
+                    className={`${className} ${getComponentClassName(props.children)}`}
+                    {...globalProps}
+                    icon={getIcon(icons, getStatusIntValue(globStatus.status))}
+                />
                 <Popover open={opened} anchorEl={anchorEl} onClose={onOpen} anchorOrigin={ORIGIN}>
                     <Stack direction="column" spacing={1}>
                         {values
@@ -186,8 +206,7 @@ const StatusList = (props: StatusListProps) => {
                                         value={val}
                                         className={`${className} ${getComponentClassName(props.children)}`}
                                         {...closeProp}
-                                        withIcons={props.withIcons}
-                                        content={content[idx+1] || content[0] || ''}
+                                        icon={getIcon(icons, getStatusIntValue(val.status))}
                                     />
                                 );
                             })}

@@ -69,30 +69,30 @@ describe("StatusList Component", () => {
         await userEvent.click(icons[0]);
         expect(queryAllByTestId("CancelIcon")).toHaveLength(3);
     });
-    it("should return 0 for unknown status", () => {
-        expect(getStatusIntValue("unknown")).toBe(0);
-        expect(getStatusIntValue("")).toBe(0);
-        expect(getStatusIntValue("a")).toBe(0);
-        expect(getStatusIntValue("z")).toBe(0);
+    it("should return -1 for unknown status", () => {
+        expect(getStatusIntValue("unknown")).toBe(-1);
+        expect(getStatusIntValue("")).toBe(-1);
+        expect(getStatusIntValue("a")).toBe(-1);
+        expect(getStatusIntValue("z")).toBe(-1);
     });
-    it('should return "info" for status 1', () => {
-        expect(getStatusStrValue(1)).toBe("info");
-    });
-
-    it('should return "success" for status 2', () => {
-        expect(getStatusStrValue(2)).toBe("success");
+    it('should return "info" for status 0', () => {
+        expect(getStatusStrValue(0)).toBe("info");
     });
 
-    it('should return "warning" for status 3', () => {
-        expect(getStatusStrValue(3)).toBe("warning");
+    it('should return "success" for status 1', () => {
+        expect(getStatusStrValue(1)).toBe("success");
     });
 
-    it('should return "error" for status 4', () => {
-        expect(getStatusStrValue(4)).toBe("error");
+    it('should return "warning" for status 2', () => {
+        expect(getStatusStrValue(2)).toBe("warning");
+    });
+
+    it('should return "error" for status 3', () => {
+        expect(getStatusStrValue(3)).toBe("error");
     });
 
     it('should return "unknown" for any other status', () => {
-        expect(getStatusStrValue(0)).toBe("unknown");
+        expect(getStatusStrValue(0)).toBe("info");
         expect(getStatusStrValue(5)).toBe("unknown");
         expect(getStatusStrValue(-1)).toBe("unknown");
     });
@@ -110,7 +110,7 @@ describe("StatusList Component", () => {
             { status: "info", message: "Information" },
             { status: "warning", message: "Warning" },
         ];
-    
+
         const { getByText } = render(<StatusList value={statuses} />);
         getByText("W");
     });
@@ -119,15 +119,15 @@ describe("StatusList Component", () => {
             { status: "info", message: "Information" },
             { status: "warning", message: "Warning" },
         ];
-    
-        const content = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><circle cx='8' cy='8' r='8' fill='red'/></svg>"
-    
-        const { container } = render(<StatusList value={statuses} customIcon={content} />);
 
-    
+        const content = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><circle cx='8' cy='8' r='8' fill='red'/></svg>"
+
+        const { container } = render(<StatusList value={statuses} useIcon={JSON.stringify({warning: content, info: true})} />);
+
+
         // Check if the SVG is rendered for the warning status
         const svg = container.querySelector("svg");
         expect(svg).toBeInTheDocument();
     });
-    
+
 });

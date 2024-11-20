@@ -1687,6 +1687,12 @@
                         "type": "bool",
                         "default_value": "False",
                         "doc": "If True, the user cannot remove the status items from the list."
+                    },
+                    {
+                        "name": "use_icon",
+                        "type": "indexed(Union[bool,str])",
+                        "default_value": "False",
+                        "doc": "TODO If True, status shows a predefined icon. A string shows as svg content (URL or element). Key from \"info\", \"success\", \"warning\", \"error\"."
                     }
                 ]
             }

@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import React, { MouseEvent, ReactNode, useEffect, useMemo, useRef} from "react";
+import React, { MouseEvent, ReactNode, useEffect, useMemo, useRef } from "react";
 import Chip from "@mui/material/Chip";
 import Avatar from "@mui/material/Avatar";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -31,9 +31,8 @@ export interface StatusType {
 interface StatusProps extends TaipyBaseProps {
     value: StatusType;
     onClose?: (evt: MouseEvent) => void;
-    icon?: ReactNode;
-    withIcons?: boolean;
-    content?: string;
+    openedIcon?: ReactNode;
+    icon ?: boolean | string;
 }
 
 const status2Color = (status: string): "error" | "info" | "success" | "warning" => {
@@ -51,111 +50,92 @@ const status2Color = (status: string): "error" | "info" | "success" | "warning" 
 };
 
 // Function to get the appropriate icon based on the status
-const GetStatusIcon = (status: string, withIcons?: boolean): ReactNode => {
+const getStatusIcon = (status: string, icon?: boolean): ReactNode => {
     // Use useMemo to memoize the iconProps as well
     const color = status2Color(status);
 
     // Memoize the iconProps
     const iconProps = {
-        sx: { fontSize: 20, color: `${color}.main` }}
-        
-        if (withIcons) {
-            switch (color) {
-                case "success":
-                    return <CheckCircleIcon {...iconProps} />;
-                case "warning":
-                    return <WarningIcon {...iconProps} />;
-                case "error":
-                    return <ErrorIcon {...iconProps} />;
-                default:
-                    return <InfoIcon {...iconProps} />;
-            }
-        } else {
-            return getInitials(status);
+        sx: { fontSize: 20, color: `${color}.main` },
+    };
+
+    if (icon) {
+        switch (color) {
+            case "success":
+                return <CheckCircleIcon {...iconProps} />;
+            case "warning":
+                return <WarningIcon {...iconProps} />;
+            case "error":
+                return <ErrorIcon {...iconProps} />;
+            default:
+                return <InfoIcon {...iconProps} />;
         }
-
+    } else {
+        return getInitials(status);
+    }
 };
-
 
 const chipSx = { alignSelf: "flex-start" };
 
 const defaultAvatarStyle = {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+};
 
 const defaultAvatarSx = {
-    bgcolor: 'transparent'
+    bgcolor: "transparent",
 };
 
 const baseStyles = {
-    fontSize: '1rem', 
-    textShadow: '1px 1px 4px black, -1px -1px 4px black',
+    fontSize: "1rem",
+    textShadow: "1px 1px 4px black, -1px -1px 4px black",
 };
 
-const isSvgUrl = (content?: string) => {
-    return content?.substring(content?.length - 4).toLowerCase() === ".svg"; // Check if it ends with ".svg"
-};
+const isSvgUrl = (icon: boolean | string) =>
+    typeof icon === "string" && icon.substring(icon?.length - 4).toLowerCase() === ".svg"; // Check if it ends with ".svg"
 
-const isInlineSvg = (content?: string) => {
-return content?.substring(0, 4).toLowerCase() === "<svg"; // Check if the content starts with "<svg"
-};
+const isInlineSvg = (icon: boolean | string) =>
+    typeof icon === "string" && icon.substring(0, 4).toLowerCase() === "<svg"; // Check if the content starts with "<svg"
 
 const Status = (props: StatusProps) => {
-    const { value, id } = props;
-    const content = props.content || undefined;
-    const withIcons = props.withIcons;
+    const { value, id, icon = false } = props;
     const svgRef = useRef<HTMLDivElement>(null);
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
 
     useEffect(() => {
-        if (content && svgRef.current) {
-            svgRef.current.innerHTML = content;
+        if (typeof icon === "string" && svgRef.current) {
+            svgRef.current.innerHTML = icon;
         }
-    }, [content]);
-
+    }, [icon]);
 
     const chipProps = useMemo(() => {
         const cp: Record<string, unknown> = {};
         const statusColor = status2Color(value.status);
         cp.color = statusColor;
-       
-        if (isSvgUrl(content)) {
+
+        if (isSvgUrl(icon)) {
+            cp.avatar = <Avatar src={icon as string} data-testid="Avatar" />;
+        } else if (isInlineSvg(icon)) {
             cp.avatar = (
-                <Avatar src={content}  data-testid="Avatar" />
-            );
-        } 
-        
-        else if(content && isInlineSvg(content)){
-            cp.avatar = (
-                <Avatar
-                    sx={defaultAvatarSx}
-                    data-testid="Avatar"
-                >
-                    <div
-                      ref={svgRef}
-                      style={defaultAvatarStyle}
-                    />
+                <Avatar sx={defaultAvatarSx} data-testid="Avatar">
+                    <div ref={svgRef} style={defaultAvatarStyle} />
                 </Avatar>
             );
-        }
-
-        else {
+        } else {
+            const isIcon = typeof icon === "boolean" && icon;
             cp.avatar = (
                 <Avatar
                     sx={{
-                        bgcolor: withIcons
-                            ? 'transparent' 
-                            : `${statusColor}.main`,  
-                        color: `${statusColor}.contrastText`, 
-                        ...baseStyles
+                        bgcolor: isIcon ? "transparent" : `${statusColor}.main`,
+                        color: `${statusColor}.contrastText`,
+                        ...baseStyles,
                     }}
                     data-testid="Avatar"
                 >
-                    {GetStatusIcon(value.status, withIcons)}
+                    {getStatusIcon(value.status, isIcon)}
                 </Avatar>
             );
         }
@@ -163,11 +143,11 @@ const Status = (props: StatusProps) => {
         if (props.onClose) {
             cp.onDelete = props.onClose;
         }
-        if (props.icon) {
-            cp.deleteIcon = props.icon;
+        if (props.openedIcon) {
+            cp.deleteIcon = props.openedIcon;
         }
         return cp;
-    }, [value.status, props.onClose, props.icon, withIcons, content]);
+    }, [value.status, props.onClose, props.openedIcon, icon]);
 
     return <Chip id={id} variant="outlined" {...chipProps} label={value.message} sx={chipSx} className={className} />;
 };
