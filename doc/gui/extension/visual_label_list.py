@@ -21,7 +21,7 @@ languages = [
 ]
 
 page = """
-<|{languages}|example.labeled_item_list|sort=asc|>
+<|{languages}|example.visual_label_list|sort=asc|>
 """
 
 if __name__ == "__main__":

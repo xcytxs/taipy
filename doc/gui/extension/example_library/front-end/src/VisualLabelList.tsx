@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { LoV, useLovListMemo } from "taipy-gui";
 
-interface LabeledItemProps {
+interface VisualLabelListProps {
     lov?: LoV;
     defaultLov?: string;
     sort?: "asc" | "desc";
@@ -19,7 +19,7 @@ const styles = {
     },
 };
 
-const LabeledItem: React.FC<LabeledItemProps> = ({ lov, defaultLov = "", sort }) => {
+const VisualLabelList: React.FC<VisualLabelListProps> = ({ lov, defaultLov = "", sort }) => {
     const lovList = useLovListMemo(lov, defaultLov);
 
     const sortedLovList = useMemo(() => {
@@ -47,4 +47,4 @@ const LabeledItem: React.FC<LabeledItemProps> = ({ lov, defaultLov = "", sort })
     );
 };
 
-export default LabeledItem;
+export default VisualLabelList;

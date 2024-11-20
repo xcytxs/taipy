@@ -8,6 +8,6 @@
 // the name used in the element declaration in the element library.
 import ColoredLabel from "./ColoredLabel";
 import GameTable from "./GameTable";
-import LabeledItem from "./LabeledItem";
+import VisualLabelList from "./VisualLabelList";
 
-export { ColoredLabel as ExampleLabel, GameTable, LabeledItem };
+export { ColoredLabel as ExampleLabel, GameTable, VisualLabelList };

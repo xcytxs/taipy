@@ -42,15 +42,15 @@ class ExampleLibrary(ElementLibrary):
                 # element, exported as GameTable in front-end/src/index.ts
                 # react_component="GameTable",
             ),
-            "labeled_item_list": Element(
+            "visual_label_list": Element(
                 "lov",
                 {
                     "lov": ElementProperty(PropertyType.lov),
                     "sort": ElementProperty(PropertyType.string),
                 },
-                # The name of the React component (LabeledItem) that implements this custom
+                # The name of the React component (VisualLabelList) that implements this custom
                 # element, exported as LabeledItemList in front-end/src/index.ts
-                react_component="LabeledItem",
+                react_component="VisualLabelList",
             )
         }
 
