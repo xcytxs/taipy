@@ -28,10 +28,5 @@ page = """
 <|{data}|example.game_table|>
 """
 
-page = """
-## Chess Game
-<|{data}|example.game_table|>
-"""
-
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game", port=3002, use_reloader=True)
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game")
