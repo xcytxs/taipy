@@ -125,7 +125,12 @@ const renderBoxSx = {
     width: "100%",
 } as CSSProperties;
 
-const Selector = (props: SelTreeProps) => {
+interface SelectorProps extends SelTreeProps {
+    dropdown?: boolean;
+    mode?: string;
+}
+
+const Selector = (props: SelectorProps) => {
     const {
         id,
         defaultValue = "",

@@ -53,8 +53,9 @@
                         "type": "dynamic(Union[str,Icon])",
                         "default_value": "\"\"",
                         "doc": "The label displayed in the button."
-                    },                                        {
-                    "name": "size",
+                    },
+                    {
+                        "name": "size",
                         "type": "str",
                         "default_value": "\"medium\"",
                         "doc": "The size of the button. Valid values: \"small\", \"medium\", or \"large\"."
@@ -1639,7 +1640,9 @@
         [
             "alert",
             {
-                "inherits": ["shared"],
+                "inherits": [
+                    "shared"
+                ],
                 "properties": [
                     {
                         "name": "message",
@@ -1856,6 +1859,14 @@
                         "name": "row_height",
                         "type": "str",
                         "doc": "The height of each row of this tree, in CSS units."
+                    },
+                    {
+                        "name": "mode",
+                        "hide": true
+                    },
+                    {
+                        "name": "dropdown",
+                        "hide": true
                     }
                 ]
             }
