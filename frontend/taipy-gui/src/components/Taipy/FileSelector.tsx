@@ -28,7 +28,7 @@ import Tooltip from "@mui/material/Tooltip";
 import UploadFile from "@mui/icons-material/UploadFile";
 
 import { TaipyContext } from "../../context/taipyContext";
-import { createAlertAction, createSendActionNameAction } from "../../context/taipyReducers";
+import { createNotificationAction, createSendActionNameAction } from "../../context/taipyReducers";
 import { useClassNames, useDynamicProperty, useModule } from "../../utils/hooks";
 import { expandSx, getCssSize, noDisplayStyle, TaipyActiveProps } from "./utils";
 import { uploadFile } from "../../workers/fileupload";
@@ -75,8 +75,8 @@ const FileSelector = (props: FileSelectorProps) => {
         notify = true,
         withBorder = true,
     } = props;
-    const directoryProps = ["d", "dir", "directory", "folder"].includes(selectionType?.toLowerCase()) ? 
-                           {webkitdirectory: "", directory: "", mozdirectory: "", nwdirectory: ""} : 
+    const directoryProps = ["d", "dir", "directory", "folder"].includes(selectionType?.toLowerCase()) ?
+                           {webkitdirectory: "", directory: "", mozdirectory: "", nwdirectory: ""} :
                            undefined;
     const [dropLabel, setDropLabel] = useState("");
     const [dropSx, setDropSx] = useState<SxProps | undefined>(defaultSx);
@@ -123,14 +123,14 @@ const FileSelector = (props: FileSelectorProps) => {
                         onAction && dispatch(createSendActionNameAction(id, module, onAction));
                         notify &&
                             dispatch(
-                                createAlertAction({ atype: "success", message: value, system: false, duration: 3000 })
+                                createNotificationAction({ atype: "success", message: value, system: false, duration: 3000 })
                             );
                     },
                     (reason) => {
                         setUpload(false);
                         notify &&
                             dispatch(
-                                createAlertAction({ atype: "error", message: reason, system: false, duration: 3000 })
+                                createNotificationAction({ atype: "error", message: reason, system: false, duration: 3000 })
                             );
                     }
                 );
