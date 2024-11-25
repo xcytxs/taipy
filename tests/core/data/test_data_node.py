@@ -807,3 +807,15 @@ class TestDataNode:
         edit_5 = data_node.edits[5]
         assert len(edit_5) == 1
         assert edit_5[EDIT_TIMESTAMP_KEY] == timestamp
+
+    def test_normalize_path(self):
+        dn = DataNode(
+            config_id="foo_bar",
+            scope=Scope.SCENARIO,
+            id=DataNodeId("an_id"),
+            path=r"data\foo\bar.csv",
+        )
+        assert dn.config_id == "foo_bar"
+        assert dn.scope == Scope.SCENARIO
+        assert dn.id == "an_id"
+        assert dn.properties["path"] == "data/foo/bar.csv"
