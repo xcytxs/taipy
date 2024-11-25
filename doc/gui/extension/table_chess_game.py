@@ -13,14 +13,14 @@ from example_library import ExampleLibrary
 from taipy.gui import Gui
 
 data = [
-    ["\u2656", "\u2658", "\u2657", "\u2655", "\u2654", "\u2657", "\u2658", "\u2656"],  # White Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook # noqa: E501
-    ["\u2659", "\u2659", "\u2659", "\u2659", "\u2659", "\u2659", "\u2659", "\u2659"],  # White Pawns
-    ["", "", "", "", "", "", "", ""],  # Empty squares
-    ["", "", "", "", "", "", "", ""],  # Empty squares
-    ["", "", "", "", "", "", "", ""],  # Empty squares
-    ["", "", "", "", "", "", "", ""],  # Empty squares
-    ["\u265F", "\u265F", "\u265F", "\u265F", "\u265F", "\u265F", "\u265F", "\u265F"],  # Black Pawns
-    ["\u265C", "\u265E", "\u265D", "\u265B", "\u265A", "\u265D", "\u265E", "\u265C"]   # Black Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook # noqa: E501
+    ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
+    ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
+    ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"]
 ]
 
 page = """
