@@ -70,6 +70,7 @@ from ._adapters import (
     _GuiCoreScenarioProperties,
     _invoke_action,
 )
+from ._utils import _ClientStatus
 from .filters import CustomScenarioFilter
 
 
@@ -92,7 +93,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
         self.data_nodes_by_owner: t.Optional[t.Dict[t.Optional[str], t.List[DataNode]]] = None
         self.scenario_configs: t.Optional[t.List[t.Tuple[str, str]]] = None
         self.jobs_list: t.Optional[t.List[Job]] = None
-        self.client_submission: t.Dict[str, SubmissionStatus] = {}
+        self.client_submission: t.Dict[str, _ClientStatus] = {}
         # register to taipy core notification
         reg_id, reg_queue = Notifier.register()
         # locks
@@ -162,28 +163,32 @@ class _GuiCoreContext(CoreEventConsumerBase):
         self.broadcast_core_changed({"scenario": scenario_id or True})
 
     def submission_status_callback(self, submission_id: t.Optional[str] = None, event: t.Optional[Event] = None):
-        if not submission_id or not is_readable(t.cast(SubmissionId, submission_id)):
+        if not submission_id:
             return
         submission = None
         new_status = None
         payload: t.Optional[t.Dict[str, t.Any]] = None
         client_id: t.Optional[str] = None
         try:
-            last_status = self.client_submission.get(submission_id)
-            if not last_status:
+            last_client_status = self.client_submission.get(submission_id)
+            if not last_client_status:
                 return
 
-            submission = t.cast(Submission, core_get(submission_id))
-            if not submission or not submission.entity_id:
-                return
+            client_id = last_client_status.client_id
 
-            payload = {}
-            new_status = t.cast(SubmissionStatus, submission.submission_status)
+            with self.gui._get_authorization(client_id):
+                if not is_readable(t.cast(SubmissionId, submission_id)):
+                    return
+                submission = t.cast(Submission, core_get(submission_id))
+                if not submission or not submission.entity_id:
+                    return
 
-            client_id = submission.properties.get("client_id")
-            if client_id:
-                running_tasks = {}
-                with self.gui._get_authorization(client_id):
+                payload = {}
+                new_status = t.cast(SubmissionStatus, submission.submission_status)
+
+                if client_id:
+                    running_tasks = {}
+                    # with self.gui._get_authorization(client_id):
                     for job in submission.jobs:
                         job = job if isinstance(job, Job) else t.cast(Job, core_get(job))
                         running_tasks[job.task.id] = (
@@ -195,7 +200,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
                         )
                     payload.update(tasks=running_tasks)
 
-                    if last_status is not new_status:
+                    if last_client_status.submission_status is not new_status:
                         # callback
                         submission_name = submission.properties.get("on_submission")
                         if submission_name:
@@ -213,15 +218,15 @@ class _GuiCoreContext(CoreEventConsumerBase):
                                 submission.properties.get("module_context"),
                             )
 
-            with self.submissions_lock:
-                if new_status in (
-                    SubmissionStatus.COMPLETED,
-                    SubmissionStatus.FAILED,
-                    SubmissionStatus.CANCELED,
-                ):
+            if new_status in (
+                SubmissionStatus.COMPLETED,
+                SubmissionStatus.FAILED,
+                SubmissionStatus.CANCELED,
+            ):
+                with self.submissions_lock:
                     self.client_submission.pop(submission_id, None)
-                else:
-                    self.client_submission[submission_id] = new_status
+            else:
+                last_client_status.submission_status = new_status
 
         except Exception as e:
             _warn(f"Submission ({submission_id}) is not available", e)
@@ -634,11 +639,11 @@ class _GuiCoreContext(CoreEventConsumerBase):
                     client_id=self.gui._get_client_id(),
                     module_context=self.gui._get_locals_context(),
                 )
+                client_status = _ClientStatus(self.gui._get_client_id(), submission_entity.submission_status)
                 with self.submissions_lock:
-                    self.client_submission[submission_entity.id] = submission_entity.submission_status
+                    self.client_submission[submission_entity.id] = client_status
                 if Config.core.mode == "development":
-                    with self.submissions_lock:
-                        self.client_submission[submission_entity.id] = SubmissionStatus.SUBMITTED
+                    client_status.submission_status = SubmissionStatus.SUBMITTED
                     self.submission_status_callback(submission_entity.id)
                 _GuiCoreContext.__assign_var(state, error_var, "")
         except Exception as e:
