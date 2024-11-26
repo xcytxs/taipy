@@ -17,6 +17,7 @@ import { useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "@mui/material/Tooltip";
+import merge from "lodash/merge";
 import { nanoid } from "nanoid";
 import {
     Config,
@@ -300,7 +301,7 @@ const Chart = (props: ChartProp) => {
     const theme = useTheme();
     const module = useModule();
 
-    const refresh = useMemo(() => data?.__taipy_refresh !== undefined ? nanoid() : false, [data]);
+    const refresh = useMemo(() => (data?.__taipy_refresh !== undefined ? nanoid() : false), [data]);
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
     const active = useDynamicProperty(props.active, props.defaultActive, true);
     const render = useDynamicProperty(props.render, props.defaultRender, true);
@@ -394,12 +395,7 @@ const Chart = (props: ChartProp) => {
             layout.template = template;
         }
         if (props.figure) {
-            return {
-                ...(props.figure[0].layout as Partial<Layout>),
-                ...layout,
-                title: title || layout.title || (props.figure[0].layout as Partial<Layout>).title,
-                clickmode: "event+select",
-            } as Layout;
+            return merge({},props.figure[0].layout as Partial<Layout>, layout, {title: title || layout.title || (props.figure[0].layout as Partial<Layout>).title, clickmode: "event+select"});
         }
         return {
             ...layout,
