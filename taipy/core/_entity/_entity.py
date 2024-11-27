@@ -19,7 +19,7 @@ class _Entity:
     _ID_PREFIX: str
     _MANAGER_NAME: str
     _is_in_context = False
-    _in_context_attributes_changed_collector: List
+    _in_context_attributes_changed_collector: List = []
 
     def __enter__(self):
         self._is_in_context = True
