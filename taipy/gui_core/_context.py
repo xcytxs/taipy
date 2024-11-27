@@ -1020,10 +1020,10 @@ class _GuiCoreContext(CoreEventConsumerBase):
 
     def __check_readable_editable(self, state: State, id: str, ent_type: str, var: t.Optional[str]):
         if not (reason := is_readable(t.cast(ScenarioId, id))):
-            _GuiCoreContext.__assign_var(state, var, f"{ent_type} {id} is not readable: {_get_reason(reason)}.")
+            _GuiCoreContext.__assign_var(state, var, f"{ent_type} {id} is not readable: {_get_reason(reason)}")
             return False
         if not (reason := is_editable(t.cast(ScenarioId, id))):
-            _GuiCoreContext.__assign_var(state, var, f"{ent_type} {id} is not editable: {_get_reason(reason)}.")
+            _GuiCoreContext.__assign_var(state, var, f"{ent_type} {id} is not editable: {_get_reason(reason)}")
             return False
         return True
 
@@ -1033,7 +1033,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
         if args is None or not isinstance(args, list) or len(args) < 1 or not isinstance(args[0], dict):
             return
         data = t.cast(dict, args[0])
-        error_var = payload.get("error_id")
+        error_var = data.get("error_id")
         entity_id = t.cast(str, data.get(_GuiCoreContext.__PROP_ENTITY_ID))
         if not self.__check_readable_editable(state, entity_id, "Data node", error_var):
             return
@@ -1049,9 +1049,9 @@ class _GuiCoreContext(CoreEventConsumerBase):
                     else float(val)
                     if data.get("type") == "float"
                     else data.get("value"),
+                    editor_id=self.gui._get_client_id(),
                     comment=t.cast(dict, data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT)),
                 )
-                entity.unlock_edit(self.gui._get_client_id())
                 _GuiCoreContext.__assign_var(state, error_var, "")
             except Exception as e:
                 _GuiCoreContext.__assign_var(state, error_var, f"Error updating Data node value. {e}")
@@ -1135,7 +1135,9 @@ class _GuiCoreContext(CoreEventConsumerBase):
                             "Error updating data node tabular value: type does not support at[] indexer.",
                         )
                 if new_data is not None:
-                    datanode.write(new_data, comment=user_data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT))
+                    datanode.write(new_data,
+                                   editor_id=self.gui._get_client_id(),
+                                   comment=user_data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT))
                     _GuiCoreContext.__assign_var(state, error_var, "")
             except Exception as e:
                 _GuiCoreContext.__assign_var(state, error_var, f"Error updating data node tabular value. {e}")
@@ -1222,6 +1224,8 @@ class _GuiCoreContext(CoreEventConsumerBase):
 
     def on_file_action(self, state: State, id: str, payload: t.Dict[str, t.Any]):
         args = t.cast(list, payload.get("args"))
+        if args is None or not isinstance(args, list) or len(args) < 1 or not isinstance(args[0], dict):
+            return
         act_payload = t.cast(t.Dict[str, str], args[0])
         dn_id = t.cast(DataNodeId, act_payload.get("id"))
         error_id = act_payload.get("error_id", "")
@@ -1229,11 +1233,10 @@ class _GuiCoreContext(CoreEventConsumerBase):
             try:
                 dn = t.cast(_FileDataNodeMixin, core_get(dn_id))
                 if act_payload.get("action") == "export":
-                    path = dn._get_downloadable_path()
-                    if path:
+                    if reason := dn.is_downloadable():
+                        path = dn._get_downloadable_path()
                         self.gui._download(Path(path), dn_id)
                     else:
-                        reason = dn.is_downloadable()
                         state.assign(
                             error_id,
                             "Data unavailable: "
@@ -1246,6 +1249,8 @@ class _GuiCoreContext(CoreEventConsumerBase):
                         reason := dn._upload(
                             act_payload.get("path", ""),
                             t.cast(t.Callable[[str, t.Any], bool], checker) if callable(checker) else None,
+                            editor_id=self.gui._get_client_id(),
+                            comment=None
                         )
                     ):
                         state.assign(error_id, f"Data unavailable: {reason.reasons}")
