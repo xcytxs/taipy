@@ -220,7 +220,7 @@ class _DataNodeConfigChecker(_ConfigChecker):
         }
 
     def _check_class_type(self, data_node_config_id: str, data_node_config: DataNodeConfig):
-        properties_to_check = self._get_class_type_and_properties()
+        properties_to_check = _DataNodeConfigChecker._get_class_type_and_properties()
 
         for storage_type in properties_to_check.keys():
             for class_type, prop_keys in properties_to_check[storage_type]:
