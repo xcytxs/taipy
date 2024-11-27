@@ -222,8 +222,8 @@ class _DataNodeConfigChecker(_ConfigChecker):
     def _check_class_type(self, data_node_config_id: str, data_node_config: DataNodeConfig):
         properties_to_check = _DataNodeConfigChecker._get_class_type_and_properties()
 
-        for storage_type in properties_to_check.keys():
-            for class_type, prop_keys in properties_to_check[storage_type]:
+        if data_node_config.storage_type in properties_to_check.keys():
+            for class_type, prop_keys in properties_to_check[data_node_config.storage_type]:
                 for prop_key in prop_keys:
                     prop_value = data_node_config.properties.get(prop_key) if data_node_config.properties else None
                     if prop_value and not isinstance(prop_value, class_type):
