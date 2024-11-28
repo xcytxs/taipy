@@ -23,6 +23,27 @@ from ..data_node_config import DataNodeConfig
 
 
 class _DataNodeConfigChecker(_ConfigChecker):
+    _PROPERTIES_TYPES: Dict[str, List[Tuple[Any, List[str]]]] = {
+        DataNodeConfig._STORAGE_TYPE_VALUE_GENERIC: [
+            (
+                Callable,
+                [
+                    DataNodeConfig._OPTIONAL_READ_FUNCTION_GENERIC_PROPERTY,
+                    DataNodeConfig._OPTIONAL_WRITE_FUNCTION_GENERIC_PROPERTY,
+                ],
+            )
+        ],
+        DataNodeConfig._STORAGE_TYPE_VALUE_SQL: [
+            (
+                Callable,
+                [
+                    DataNodeConfig._REQUIRED_WRITE_QUERY_BUILDER_SQL_PROPERTY,
+                    DataNodeConfig._OPTIONAL_APPEND_QUERY_BUILDER_SQL_PROPERTY,
+                ],
+            ),
+        ],
+    }
+
     def __init__(self, config: _Config, collector: IssueCollector):
         super().__init__(config, collector)
 
@@ -196,34 +217,9 @@ class _DataNodeConfigChecker(_ConfigChecker):
                     f"DataNodeConfig `{data_node_config_id}` must be populated with a Callable function.",
                 )
 
-    @staticmethod
-    def _get_class_type_and_properties() -> Dict[str, List[Tuple[Any, List[str]]]]:
-        return {
-            DataNodeConfig._STORAGE_TYPE_VALUE_GENERIC: [
-                (
-                    Callable,
-                    [
-                        DataNodeConfig._OPTIONAL_READ_FUNCTION_GENERIC_PROPERTY,
-                        DataNodeConfig._OPTIONAL_WRITE_FUNCTION_GENERIC_PROPERTY,
-                    ],
-                )
-            ],
-            DataNodeConfig._STORAGE_TYPE_VALUE_SQL: [
-                (
-                    Callable,
-                    [
-                        DataNodeConfig._REQUIRED_WRITE_QUERY_BUILDER_SQL_PROPERTY,
-                        DataNodeConfig._OPTIONAL_APPEND_QUERY_BUILDER_SQL_PROPERTY,
-                    ],
-                ),
-            ],
-        }
-
     def _check_class_type(self, data_node_config_id: str, data_node_config: DataNodeConfig):
-        properties_to_check = _DataNodeConfigChecker._get_class_type_and_properties()
-
-        if data_node_config.storage_type in properties_to_check.keys():
-            for class_type, prop_keys in properties_to_check[data_node_config.storage_type]:
+        if data_node_config.storage_type in self._PROPERTIES_TYPES.keys():
+            for class_type, prop_keys in self._PROPERTIES_TYPES[data_node_config.storage_type]:
                 for prop_key in prop_keys:
                     prop_value = data_node_config.properties.get(prop_key) if data_node_config.properties else None
                     if prop_value and not isinstance(prop_value, class_type):
