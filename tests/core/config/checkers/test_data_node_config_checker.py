@@ -581,6 +581,22 @@ class TestDataNodeConfigChecker:
         Config.check()
         assert len(Config._collector.errors) == 0
 
+        config._sections[DataNodeConfig.name]["new"].storage_type = "generic"
+        config._sections[DataNodeConfig.name]["new"].properties = {"write_fct": lambda x: x, "read_fct": lambda y: y}
+        with pytest.raises(SystemExit):
+            Config._collector = IssueCollector()
+            Config.check()
+        assert len(Config._collector.errors) == 2
+        expected_error_messages = [
+            "`write_fct` of DataNodeConfig `new` must be populated with a Callable and not a lambda."
+            " Current value of property `write_fct` is <function TestDataNodeConfigChecker."
+            "test_check_callable_properties.<locals>.<lambda>",
+            "`read_fct` of DataNodeConfig `new` must be populated with a Callable and not a lambda."
+            " Current value of property `read_fct` is <function TestDataNodeConfigChecker."
+            "test_check_callable_properties.<locals>.<lambda>",
+        ]
+        assert all(message in caplog.text for message in expected_error_messages)
+
     def test_check_read_write_fct_args(self, caplog):
         config = Config._applied_config
         Config._compile_configs()

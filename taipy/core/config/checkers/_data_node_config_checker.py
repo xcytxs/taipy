@@ -227,7 +227,14 @@ class _DataNodeConfigChecker(_ConfigChecker):
                             prop_key,
                             prop_value,
                             f"`{prop_key}` of DataNodeConfig `{data_node_config_id}` must be"
-                            f" populated with a {class_type.__qualname__}.",
+                            f" populated with a {'Callable' if class_type == Callable else class_type.__name__}.",
+                        )
+                    if class_type == Callable and callable(prop_value) and prop_value.__name__ == "<lambda>":
+                        self._error(
+                            prop_key,
+                            prop_value,
+                            f"`{prop_key}` of DataNodeConfig `{data_node_config_id}` must be"
+                            f" populated with a Callable and not a lambda.",
                         )
 
     def _check_exposed_type(self, data_node_config_id: str, data_node_config: DataNodeConfig):
