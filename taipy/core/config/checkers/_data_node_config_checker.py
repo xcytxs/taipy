@@ -227,7 +227,7 @@ class _DataNodeConfigChecker(_ConfigChecker):
                             prop_key,
                             prop_value,
                             f"`{prop_key}` of DataNodeConfig `{data_node_config_id}` must be"
-                            f" populated with a {class_type.__name__}.",
+                            f" populated with a {class_type.__qualname__}.",
                         )
 
     def _check_exposed_type(self, data_node_config_id: str, data_node_config: DataNodeConfig):
