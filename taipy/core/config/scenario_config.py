@@ -33,7 +33,6 @@ class ScenarioConfig(Section):
     _TASKS_KEY = "tasks"
     _ADDITIONAL_DATA_NODES_KEY = "additional_data_nodes"
     _FREQUENCY_KEY = "frequency"
-    _SEQUENCES_KEY = "sequences"
     _COMPARATOR_KEY = "comparators"
 
     frequency: Optional[Frequency]
@@ -305,7 +304,7 @@ class ScenarioConfig(Section):
                 corresponds to the data node configuration id. During the scenarios'
                 comparison, each comparator is applied to all the data nodes instantiated from
                 the data node configuration attached to the comparator. See
-                `(taipy.)compare_scenarios()^` more more details.
+                `(taipy.)compare_scenarios()^` more details.
             sequences (Optional[Dict[str, List[TaskConfig]]]): Dictionary of sequence descriptions.
                 The default value is None.
             **properties (dict[str, any]): A keyworded variable length list of additional arguments.
@@ -355,7 +354,7 @@ class ScenarioConfig(Section):
                 corresponds to the data node configuration id. During the scenarios'
                 comparison, each comparator is applied to all the data nodes instantiated from
                 the data node configuration attached to the comparator. See
-                `taipy.compare_scenarios()^` more more details.
+                `taipy.compare_scenarios()^` more details.
             sequences (Optional[Dict[str, List[TaskConfig]]]): Dictionary of sequences. The default value is None.
             **properties (dict[str, any]): A keyworded variable length list of additional arguments.
 
@@ -373,3 +372,64 @@ class ScenarioConfig(Section):
         )
         Config._register(section)
         return Config.sections[ScenarioConfig.name][_Config.DEFAULT_KEY]
+
+    def draw(self, file_path: Optional[str]=None) -> None:
+        """
+        Export the scenario configuration graph as a PNG file.
+
+        This function uses the `matplotlib` library to draw the scenario configuration graph.
+        `matplotlib` must be installed independently of `taipy` as it is not a dependency.
+        If `matplotlib` is not installed, the function will log an error message, and do nothing.
+
+        Arguments:
+            file_path (Optional[str]): The path to save the PNG file.
+                If not provided, the file will be saved with the scenario configuration id.
+        """
+        from importlib import util
+
+        from taipy.common.logger._taipy_logger import _TaipyLogger
+        logger = _TaipyLogger._get_logger()
+
+        if not util.find_spec("matplotlib"):
+            logger.error("Cannot draw the scenario configuration as `matplotlib` is not installed.")
+            return
+        import matplotlib.pyplot as plt
+        import networkx as nx
+
+        from taipy.core._entity._dag import _DAG
+
+        def build_dag() -> nx.DiGraph:
+            g = nx.DiGraph()
+            for task in set(self.tasks):
+                if has_input := task.inputs:
+                    for predecessor in task.inputs:
+                        g.add_edges_from([(predecessor, task)])
+                if has_output := task.outputs:
+                    for successor in task.outputs:
+                        g.add_edges_from([(task, successor)])
+                if not has_input and not has_output:
+                    g.add_node(task)
+            return g
+        graph = build_dag()
+        dag = _DAG(graph)
+        pos = {node.entity: (node.x, node.y) for node in dag.nodes.values()}
+        labls = {node.entity: node.entity.id for node in dag.nodes.values()}
+
+        # Draw the graph
+        plt.figure(figsize=(10, 10))
+        nx.draw_networkx_nodes(graph, pos,
+                               nodelist=[node for node in graph.nodes if isinstance(node, DataNodeConfig)],
+                               node_color="skyblue",
+                               node_shape="s",
+                               node_size=2000)
+        nx.draw_networkx_nodes(graph, pos,
+                               nodelist=[node for node in graph.nodes if isinstance(node, TaskConfig)],
+                               node_color="orange",
+                               node_shape="D",
+                               node_size=2000)
+        nx.draw_networkx_labels(graph, pos, labels=labls)
+        nx.draw_networkx_edges(graph, pos, node_size=2000, edge_color="black", arrowstyle="->", arrowsize=25)
+        path = file_path or f"{self.id}.png"
+        plt.savefig(path)
+        plt.close()  # Close the plot to avoid display
+        logger.info(f"The graph image of the scenario configuration `{self.id}` is exported: {path}")

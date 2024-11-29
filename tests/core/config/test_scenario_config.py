@@ -12,6 +12,8 @@
 import os
 from unittest import mock
 
+import pytest
+
 from taipy.common.config import Config
 from taipy.common.config.common.frequency import Frequency
 from tests.core.utils.named_temporary_file import NamedTemporaryFile
@@ -299,3 +301,80 @@ def test_add_sequence():
     assert len(scenario_config.sequences) == 2
     scenario_config.remove_sequences(["sequence2", "sequence3"])
     assert len(scenario_config.sequences) == 0
+
+@pytest.mark.skip(reason="Generates a png that must be visually verified.")
+def test_draw_1():
+    dn_config_1 = Config.configure_data_node("dn1")
+    dn_config_2 = Config.configure_data_node("dn2")
+    dn_config_3 = Config.configure_data_node("dn3")
+    dn_config_4 = Config.configure_data_node("dn4")
+    dn_config_5 = Config.configure_data_node("dn5")
+    task_config_1 = Config.configure_task("task1", sum, input=[dn_config_1, dn_config_2], output=dn_config_3)
+    task_config_2 = Config.configure_task("task2", sum, input=[dn_config_1, dn_config_3], output=dn_config_4)
+    task_config_3 = Config.configure_task("task3", print, input=dn_config_4)
+    scenario_cfg = Config.configure_scenario(
+        "scenario1",
+        [task_config_1, task_config_2, task_config_3],
+        [dn_config_5],
+    )
+    scenario_cfg.draw()
+
+@pytest.mark.skip(reason="Generates a png that must be visually verified.")
+def test_draw_2():
+    data_node_1 = Config.configure_data_node("s1")
+    data_node_2 = Config.configure_data_node("s2")
+    data_node_4 = Config.configure_data_node("s4")
+    data_node_5 = Config.configure_data_node("s5")
+    data_node_6 = Config.configure_data_node("s6")
+    data_node_7 = Config.configure_data_node("s7")
+    task_1 = Config.configure_task("t1", print, [data_node_1, data_node_2], [data_node_4])
+    task_2 = Config.configure_task("t2", print, None, [data_node_5])
+    task_3 = Config.configure_task("t3", print, [data_node_5, data_node_4], [data_node_6])
+    task_4 = Config.configure_task("t4", print, [data_node_4], [data_node_7])
+    scenario_cfg = Config.configure_scenario("scenario1", [task_4, task_2, task_1, task_3])
+
+    #  6  |   t2 _____
+    #  5  |           \
+    #  4  |            s5 _________________ t3 _______ s6
+    #  3  |   s1 __            _ s4 _____/
+    #  2  |        \ _ t1 ____/          \_ t4 _______ s7
+    #  1  |        /
+    #  0  |   s2 --
+    #     |________________________________________________
+    #         0        1         2          3          4
+    scenario_cfg.draw("draw_2")
+
+@pytest.mark.skip(reason="Generates a png that must be visually verified.")
+def test_draw_3():
+    data_node_1 = Config.configure_data_node("s1")
+    data_node_2 = Config.configure_data_node("s2")
+    data_node_3 = Config.configure_data_node("s3")
+    data_node_4 = Config.configure_data_node("s4")
+    data_node_5 = Config.configure_data_node("s5")
+    data_node_6 = Config.configure_data_node("s6")
+    data_node_7 = Config.configure_data_node("s7")
+
+    task_1 = Config.configure_task("t1", print, [data_node_1, data_node_2, data_node_3], [data_node_4])
+    task_2 = Config.configure_task("t2", print, [data_node_4], None)
+    task_3 = Config.configure_task("t3", print, [data_node_4], [data_node_5])
+    task_4 = Config.configure_task("t4", print, None, output=[data_node_6])
+    task_5 = Config.configure_task("t5", print, [data_node_7], None)
+    scenario_cfg = Config.configure_scenario("scenario1", [task_5, task_3, task_4, task_2, task_1])
+
+
+    #  12 |  s7 __
+    #  11 |       \
+    #  10 |        \
+    #  9  |  t4 _   \_ t5
+    #  8  |      \                     ____ t3 ___
+    #  7  |       \                   /           \
+    #  6  |  s3 _  \__ s6      _ s4 _/             \___ s5
+    #  5  |      \            /      \
+    #  4  |       \          /        \____ t2
+    #  3  |  s2 ___\__ t1 __/
+    #  2  |        /
+    #  1  |       /
+    #  0  |  s1 _/
+    #     |________________________________________________
+    #         0         1         2          3          4
+    scenario_cfg.draw("draw_3")
