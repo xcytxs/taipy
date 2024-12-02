@@ -24,6 +24,7 @@ from taipy.common.config.common._template_handler import _TemplateHandler as _tp
 from taipy.common.config.common.scope import Scope
 from taipy.common.config.section import Section
 
+from ..common._utils import _normalize_path
 from ..common._warnings import _warn_deprecated
 from ..common.mongo_default_document import MongoDefaultDocument
 
@@ -284,6 +285,8 @@ class DataNodeConfig(Section):
         self._storage_type = storage_type
         self._scope = scope
         self._validity_period = validity_period
+        if "path" in properties:
+            properties["path"] = _normalize_path(properties["path"])
         super().__init__(id, **properties)
 
         # modin exposed type is deprecated since taipy 3.1.0
