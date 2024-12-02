@@ -134,9 +134,9 @@ class CSVDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
             path = self._path
 
         properties = self.properties
-        if properties[self._EXPOSED_TYPE_PROPERTY] == self._EXPOSED_TYPE_PANDAS:
+        if properties[self._EXPOSED_TYPE_PROPERTY] in [self._EXPOSED_TYPE_PANDAS, self._EXPOSED_TYPE_PANDAS_DATAFRAME]:
             return self._read_as_pandas_dataframe(path=path)
-        if properties[self._EXPOSED_TYPE_PROPERTY] == self._EXPOSED_TYPE_NUMPY:
+        if properties[self._EXPOSED_TYPE_PROPERTY] in [self._EXPOSED_TYPE_NUMPY, self._EXPOSED_TYPE_NUMPY_NDARRAY]:
             return self._read_as_numpy(path=path)
         return self._read_as(path=path)
 

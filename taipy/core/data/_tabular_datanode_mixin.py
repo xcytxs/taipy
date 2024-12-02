@@ -26,6 +26,9 @@ class _TabularDataNodeMixin(object):
     _EXPOSED_TYPE_PANDAS = "pandas"
     _EXPOSED_TYPE_MODIN = "modin"  # Deprecated in favor of pandas since 3.1.0
     _VALID_STRING_EXPOSED_TYPES = [_EXPOSED_TYPE_PANDAS, _EXPOSED_TYPE_NUMPY]
+    _VALID_OTHER_EXPOSED_TYPES = [pd.DataFrame, np.ndarray]
+    _EXPOSED_TYPE_PANDAS_DATAFRAME = pd.DataFrame
+    _EXPOSED_TYPE_NUMPY_NDARRAY = np.ndarray
 
     def __init__(self, **kwargs) -> None:
         self._decoder: Union[Callable, Any]
@@ -43,7 +46,6 @@ class _TabularDataNodeMixin(object):
         custom_encoder = getattr(self.custom_document, "encode", None)
         if callable(custom_encoder):
             self._encoder = custom_encoder
-
 
     def _convert_data_to_dataframe(self, exposed_type: Any, data: Any) -> Union[pd.DataFrame, pd.Series]:
         if exposed_type == self._EXPOSED_TYPE_PANDAS and isinstance(data, (pd.DataFrame, pd.Series)):

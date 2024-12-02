@@ -300,6 +300,26 @@ class TestExcelDataNode:
         data = dn.read()
         assert isinstance(data, pd.DataFrame)
 
+    def test_pandas_dataframe_exposed_type(self):
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo",
+            Scope.SCENARIO,
+            properties={"default_path": path, "exposed_type": pd.DataFrame, "sheet_name": "Sheet1"},
+        )
+        assert dn.properties["exposed_type"] == pd.DataFrame
+        data = dn.read()
+        assert isinstance(data, pd.DataFrame)
+
+    def test_numpy_ndarray_exposed_type(self):
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo", Scope.SCENARIO, properties={"default_path": path, "exposed_type": np.ndarray, "sheet_name": "Sheet1"}
+        )
+        assert dn.properties["exposed_type"] == np.ndarray
+        data = dn.read()
+        assert isinstance(data, np.ndarray)
+
     def test_complex_exposed_type_dict(self):
         # ["Sheet1", "Sheet2", "Sheet3", "Sheet4", "Sheet5"]
         path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example_4.xlsx")

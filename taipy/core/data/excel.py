@@ -137,7 +137,7 @@ class ExcelDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
 
     @staticmethod
     def _check_exposed_type(exposed_type):
-        if isinstance(exposed_type, str):
+        if isinstance(exposed_type, str) or exposed_type in [pd.DataFrame, np.ndarray]:
             _TabularDataNodeMixin._check_exposed_type(exposed_type)
         elif isinstance(exposed_type, list):
             for t in exposed_type:
@@ -154,18 +154,18 @@ class ExcelDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
             path = self._path
 
         exposed_type = self.properties[self._EXPOSED_TYPE_PROPERTY]
-        if exposed_type == self._EXPOSED_TYPE_PANDAS:
+        if exposed_type in [self._EXPOSED_TYPE_PANDAS, self._EXPOSED_TYPE_PANDAS_DATAFRAME]:
             return self._read_as_pandas_dataframe(path=path)
-        if exposed_type == self._EXPOSED_TYPE_NUMPY:
+        if exposed_type in [self._EXPOSED_TYPE_NUMPY, self._EXPOSED_TYPE_NUMPY_NDARRAY]:
             return self._read_as_numpy(path=path)
         return self._read_as(path=path)
 
     def _read_sheet_with_exposed_type(
         self, path: str, sheet_exposed_type: str, sheet_name: str
     ) -> Optional[Union[np.ndarray, pd.DataFrame]]:
-        if sheet_exposed_type == self._EXPOSED_TYPE_NUMPY:
+        if sheet_exposed_type in [self._EXPOSED_TYPE_NUMPY, self._EXPOSED_TYPE_NUMPY_NDARRAY]:
             return self._read_as_numpy(path, sheet_name)
-        elif sheet_exposed_type == self._EXPOSED_TYPE_PANDAS:
+        elif sheet_exposed_type in [self._EXPOSED_TYPE_PANDAS, self._EXPOSED_TYPE_PANDAS_DATAFRAME]:
             return self._read_as_pandas_dataframe(path, sheet_name)  # type: ignore
         return None
 
@@ -202,6 +202,10 @@ class ExcelDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
                         sheet_exposed_type = exposed_type.get(sheet_name, self._EXPOSED_TYPE_PANDAS)
                     elif isinstance(exposed_type, List):
                         sheet_exposed_type = exposed_type[i]
+                    elif exposed_type == np.ndarray:
+                        sheet_exposed_type = self._EXPOSED_TYPE_NUMPY
+                    elif exposed_type == pd.DataFrame:
+                        sheet_exposed_type = self._EXPOSED_TYPE_PANDAS
 
                     if isinstance(sheet_exposed_type, str):
                         sheet_data = self._read_sheet_with_exposed_type(path, sheet_exposed_type, sheet_name)
