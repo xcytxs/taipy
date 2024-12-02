@@ -53,8 +53,9 @@
                         "type": "dynamic(Union[str,Icon])",
                         "default_value": "\"\"",
                         "doc": "The label displayed in the button."
-                    },                                        {
-                    "name": "size",
+                    },
+                    {
+                        "name": "size",
                         "type": "str",
                         "default_value": "\"medium\"",
                         "doc": "The size of the button. Valid values: \"small\", \"medium\", or \"large\"."
@@ -1639,7 +1640,9 @@
         [
             "alert",
             {
-                "inherits": ["shared"],
+                "inherits": [
+                    "shared"
+                ],
                 "properties": [
                     {
                         "name": "message",
@@ -1815,8 +1818,14 @@
                     {
                         "name": "max_file_size",
                         "type": "int",
-                        "default_value": "1024 * 1024",
-                        "doc": "The maximum allowable file size, in bytes, for files uploaded to a chat message.\nThe default is 1 MB."
+                        "default_value": "0.8 * 1024 * 1024",
+                        "doc": "The maximum allowable file size, in bytes, for files uploaded to a chat message.\nThe default is 0.8 MB."
+                    },
+                    {
+                        "name": "allow_send_images",
+                        "type": "bool",
+                        "default_value": "True",
+                        "doc": "TODO if True, an upload image icon is shown."
                     }
                 ]
             }
@@ -1850,6 +1859,14 @@
                         "name": "row_height",
                         "type": "str",
                         "doc": "The height of each row of this tree, in CSS units."
+                    },
+                    {
+                        "name": "mode",
+                        "hide": true
+                    },
+                    {
+                        "name": "dropdown",
+                        "hide": true
                     }
                 ]
             }

@@ -116,9 +116,10 @@ class _Factory:
                 ("users", PropertyType.lov),
                 ("sender_id",),
                 ("height",),
-                ("page_size", PropertyType.number, 50),
-                ("max_file_size", PropertyType.number, 1 * 1024 * 1024),
+                ("page_size", PropertyType.number),
+                ("max_file_size", PropertyType.number),
                 ("show_sender", PropertyType.boolean, False),
+                ("allow_send_images", PropertyType.boolean, True),
                 ("mode",),
             ]
         ),

@@ -277,6 +277,7 @@ const Input = (props: TaipyInputProps) => {
                                       aria-label="Increment value"
                                       size="small"
                                       onMouseDown={handleUpStepperMouseDown}
+                                      disabled={!active}
                                   >
                                       <ArrowDropUpIcon fontSize="inherit" />
                                   </IconButton>
@@ -284,6 +285,7 @@ const Input = (props: TaipyInputProps) => {
                                       aria-label="Decrement value"
                                       size="small"
                                       onMouseDown={handleDownStepperMouseDown}
+                                      disabled={!active}
                                   >
                                       <ArrowDropDownIcon fontSize="inherit" />
                                   </IconButton>
@@ -309,6 +311,7 @@ const Input = (props: TaipyInputProps) => {
                   }
                 : undefined,
         [
+            active,
             type,
             step,
             min,
@@ -330,23 +333,23 @@ const Input = (props: TaipyInputProps) => {
     return (
         <Tooltip title={hover || ""}>
             <>
-            <TextField
-                sx={textSx}
-                margin="dense"
-                hiddenLabel
-                value={value ?? ""}
-                className={`${className} ${getComponentClassName(props.children)}`}
-                type={showPassword && type == "password" ? "text" : type}
-                id={id}
-                slotProps={inputProps}
-                label={props.label}
-                onChange={handleInput}
-                disabled={!active}
-                onKeyDown={handleAction}
-                multiline={multiline}
-                minRows={linesShown}
-            />
-            {props.children}
+                <TextField
+                    sx={textSx}
+                    margin="dense"
+                    hiddenLabel
+                    value={value ?? ""}
+                    className={`${className} ${getComponentClassName(props.children)}`}
+                    type={showPassword && type == "password" ? "text" : type}
+                    id={id}
+                    slotProps={inputProps}
+                    label={props.label}
+                    onChange={handleInput}
+                    disabled={!active}
+                    onKeyDown={handleAction}
+                    multiline={multiline}
+                    minRows={linesShown}
+                />
+                {props.children}
             </>
         </Tooltip>
     );
