@@ -14,6 +14,9 @@ from copy import copy
 from datetime import timedelta
 from typing import Any, Callable, Dict, List, Optional, Union
 
+import numpy
+import pandas
+
 from taipy.common.config import Config
 from taipy.common.config._config import _Config
 from taipy.common.config.common._config_blocker import _ConfigBlocker
@@ -70,11 +73,17 @@ class DataNodeConfig(Section):
     _EXPOSED_TYPE_PANDAS = "pandas"
     _EXPOSED_TYPE_MODIN = "modin"  # Deprecated in favor of pandas since 3.1.0
     _EXPOSED_TYPE_NUMPY = "numpy"
+    _EXPOSED_TYPE_PANDAS_DATAFRAME = pandas.DataFrame
+    _EXPOSED_TYPE_NUMPY_NDARRAY = numpy.ndarray
+    _EXPOSED_TYPE_LIST = List
     _DEFAULT_EXPOSED_TYPE = _EXPOSED_TYPE_PANDAS
 
     _ALL_EXPOSED_TYPES = [
         _EXPOSED_TYPE_PANDAS,
         _EXPOSED_TYPE_NUMPY,
+        _EXPOSED_TYPE_PANDAS_DATAFRAME,
+        _EXPOSED_TYPE_NUMPY_NDARRAY,
+        _EXPOSED_TYPE_LIST,
     ]
 
     _OPTIONAL_ENCODING_PROPERTY = "encoding"
@@ -322,7 +331,7 @@ class DataNodeConfig(Section):
 
     @property
     def validity_period(self) -> Optional[timedelta]:
-        """ The validity period of the data nodes instantiated from the data node config.
+        """The validity period of the data nodes instantiated from the data node config.
 
         It corresponds to the duration since the last edit date for which the data node
         can be considered valid. Once the validity period has passed, the data node is

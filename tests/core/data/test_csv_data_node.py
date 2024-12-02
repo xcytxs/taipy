@@ -155,6 +155,16 @@ class TestCSVDataNode:
         dn = CSVDataNode("foo", Scope.SCENARIO, properties={"path": path, "exposed_type": "pandas"})
         assert isinstance(dn.read(), pd.DataFrame)
 
+    def test_pandas_dataframe_exposed_type(self):
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.csv")
+        dn = CSVDataNode("foo", Scope.SCENARIO, properties={"path": path, "exposed_type": pd.DataFrame})
+        assert isinstance(dn.read(), pd.DataFrame)
+
+    def test_numpy_ndarray_exposed_type(self):
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.csv")
+        dn = CSVDataNode("foo", Scope.SCENARIO, properties={"path": path, "exposed_type": np.ndarray})
+        assert isinstance(dn.read(), np.ndarray)
+
     def test_raise_error_invalid_exposed_type(self):
         path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.csv")
         with pytest.raises(InvalidExposedType):
