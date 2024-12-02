@@ -1155,9 +1155,9 @@ class Gui:
 
         Arguments:
             converter: A function that converts a value with an unsupported data type (the only
-              parameter to the function) into data with a supported data type (the returned value
-              from the function).</br>
-              If set to `None`, it removes any existing converter.
+                parameter to the function) into data with a supported data type (the returned value
+                from the function).</br>
+                If set to `None`, it removes any existing converter.
         """
         Gui.__unsupported_data_converter = converter
 
