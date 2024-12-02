@@ -14,11 +14,13 @@ from taipy.gui import Gui
 
 example_library = ExampleLibrary()
 text_file_path = example_library.get_resource("resources/company_profile.md")
+logo_path = example_library.get_resource("resources/taipy_logo.png")
 
 with open(text_file_path, "r") as file:
     text_content = file.read()
 
 page = """
+<|{logo_path}|image|width=100px|>
 <|{text_content}|text|mode=markdown|>
 """
 
