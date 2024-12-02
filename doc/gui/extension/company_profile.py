@@ -23,4 +23,4 @@ page = """
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Company profile", port=3009, use_reloader=True)
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Company profile")
