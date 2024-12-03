@@ -234,7 +234,7 @@ class _DataNodeConfigChecker(_ConfigChecker):
                             prop_key,
                             prop_value,
                             f"`{prop_key}` of DataNodeConfig `{data_node_config_id}` must be"
-                            f" populated with a Callable and not a lambda.",
+                            f" populated with a serializable Callable function but not a lambda.",
                         )
 
     def _check_exposed_type(self, data_node_config_id: str, data_node_config: DataNodeConfig):
