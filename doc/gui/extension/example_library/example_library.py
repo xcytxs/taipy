@@ -9,8 +9,9 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-from taipy.gui.extension import Element, ElementLibrary, ElementProperty, PropertyType
 import base64
+
+from taipy.gui.extension import Element, ElementLibrary, ElementProperty, PropertyType
 
 
 class ExampleLibrary(ElementLibrary):
