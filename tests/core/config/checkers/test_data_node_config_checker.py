@@ -588,11 +588,11 @@ class TestDataNodeConfigChecker:
             Config.check()
         assert len(Config._collector.errors) == 2
         expected_error_messages = [
-            "`write_fct` of DataNodeConfig `new` must be populated with a Callable and not a lambda."
-            " Current value of property `write_fct` is <function TestDataNodeConfigChecker."
+            "`write_fct` of DataNodeConfig `new` must be populated with a serializable Callable function but"
+            " not a lambda. Current value of property `write_fct` is <function TestDataNodeConfigChecker."
             "test_check_callable_properties.<locals>.<lambda>",
-            "`read_fct` of DataNodeConfig `new` must be populated with a Callable and not a lambda."
-            " Current value of property `read_fct` is <function TestDataNodeConfigChecker."
+            "`read_fct` of DataNodeConfig `new` must be populated with a serializable Callable function but"
+            " not a lambda. Current value of property `read_fct` is <function TestDataNodeConfigChecker."
             "test_check_callable_properties.<locals>.<lambda>",
         ]
         assert all(message in caplog.text for message in expected_error_messages)
