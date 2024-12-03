@@ -9,5 +9,6 @@
 import ColoredLabel from "./ColoredLabel";
 import GameTable from "./GameTable";
 import VisualLabelList from "./VisualLabelList";
+import LogoWithText from "./LogoWithText";
 
-export { ColoredLabel as ExampleLabel, GameTable, VisualLabelList };
+export { ColoredLabel as ExampleLabel, GameTable, VisualLabelList, LogoWithText };

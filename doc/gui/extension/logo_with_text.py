@@ -12,17 +12,11 @@ from example_library import ExampleLibrary
 
 from taipy.gui import Gui
 
-example_library = ExampleLibrary()
-text_file_path = example_library.get_resource("resources/company_profile.md")
-logo_path = example_library.get_resource("resources/taipy_logo.png")
-
-with open(text_file_path, "r") as file:
-    text_content = file.read()
+name = "Taipy"
 
 page = """
-<|{logo_path}|image|width=100px|>
-<|{text_content}|text|mode=markdown|>
+<|{name}|logo_with_text|>
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Company profile")
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Logo with text")
