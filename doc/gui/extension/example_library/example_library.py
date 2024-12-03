@@ -20,7 +20,7 @@ class ExampleLibrary(ElementLibrary):
 
         logo_path = self.get_resource("resources/taipy_logo.png")
         with open(logo_path, "rb") as f:
-            logo_path = base64.b64encode(f.read()).decode("utf-8")
+            logo_base64 = base64.b64encode(f.read()).decode("utf-8")
 
         self.elements = {
             # A static element that displays its properties in a fraction
@@ -63,7 +63,7 @@ class ExampleLibrary(ElementLibrary):
                 "text",
                 {
                     "text": ElementProperty(PropertyType.string),
-                    "logo_path": ElementProperty(PropertyType.string, default_value=logo_path),
+                    "logo_path": ElementProperty(PropertyType.string, default_value=logo_base64),
                 },
             )
         }
