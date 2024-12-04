@@ -71,8 +71,7 @@ class _Factory:
     __LIBRARIES: t.Dict[str, t.List["ElementLibrary"]] = {}
 
     __CONTROL_BUILDERS = {
-        "alert":
-        lambda gui, control_type, attrs: _Builder(
+        "alert": lambda gui, control_type, attrs: _Builder(
             gui=gui,
             control_type=control_type,
             element_name="Alert",
@@ -507,6 +506,8 @@ class _Factory:
                 ("label",),
                 ("mode",),
                 ("lov", PropertyType.lov),
+                ("selection_message", PropertyType.dynamic_string),
+                ("show_select_all", PropertyType.boolean),
             ]
         )
         ._set_propagate(),
@@ -550,7 +551,8 @@ class _Factory:
                 ("without_close", PropertyType.boolean, False),
                 ("hover_text", PropertyType.dynamic_string),
             ]
-        )._set_indexed_icons(),
+        )
+        ._set_indexed_icons(),
         "table": lambda gui, control_type, attrs: _Builder(
             gui=gui,
             control_type=control_type,
