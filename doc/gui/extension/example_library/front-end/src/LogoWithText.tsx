@@ -13,8 +13,8 @@ const styles = {
         alignItems: "center",
     },
     logo: {
-        width: "1em",
-        height: "1em",
+        width: "4em",
+        height: "4em",
         marginRight: "10px",
     },
 };
@@ -26,7 +26,7 @@ const LogoWithText = ({ text, defaultText, logoPath }: CaptionProps) => {
         <div style={styles.container}>
             <img
                 src={`data:image/png;base64,${logoPath}`}
-                alt="LogoWithText Image"
+                alt="LogoWithText"
                 style={styles.logo}
             />
             <div>{value}</div>

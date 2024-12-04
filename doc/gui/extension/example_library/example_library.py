@@ -18,7 +18,7 @@ class ExampleLibrary(ElementLibrary):
     def __init__(self) -> None:
         # Initialize the set of visual elements for this extension library
 
-        logo_path = self.get_resource("resources/taipy_logo.png")
+        logo_path = self.get_resource("assets/logo.png")
         with open(logo_path, "rb") as f:
             logo_base64 = base64.b64encode(f.read()).decode("utf-8")
 
@@ -91,4 +91,7 @@ class ExampleLibrary(ElementLibrary):
 
     def get_scripts(self) -> list[str]:
         # Only one JavaScript bundle for this library.
-        return ["front-end/dist/exampleLibrary.js"]
+        return [
+            "front-end/dist/exampleLibrary.js",
+            "front-end/scripts/logoAnimation.js",
+        ]
