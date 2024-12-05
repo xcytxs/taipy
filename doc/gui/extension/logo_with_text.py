@@ -12,21 +12,11 @@ from example_library import ExampleLibrary
 
 from taipy.gui import Gui
 
-data = [
-    ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"],
-    ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
-    ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"]
-]
+name = "Taipy"
 
 page = """
-## Chess Game
-<|{data}|example.game_table|>
+<|{name}|logo_with_text|>
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Chess Game")
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Logo with text")

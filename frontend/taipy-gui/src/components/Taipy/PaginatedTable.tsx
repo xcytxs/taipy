@@ -524,7 +524,7 @@ const PaginatedTable = (props: TaipyPaginatedTableProps) => {
                                             sortDirection={orderBy === columns[col].dfid && order}
                                             sx={
                                                 columns[col].width
-                                                    ? { width: columns[col].width }
+                                                    ? { minWidth: columns[col].width }
                                                     : nbWidth
                                                     ? { minWidth: `${100 / nbWidth}%` }
                                                     : undefined
