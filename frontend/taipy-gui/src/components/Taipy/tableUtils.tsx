@@ -223,6 +223,7 @@ export interface FilterDesc {
     value: string | number | boolean | Date;
     type: string;
     matchcase?: boolean;
+    params?: number[];
 }
 
 export const defaultColumns = {} as Record<string, ColumnDesc>;

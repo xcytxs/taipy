@@ -71,7 +71,7 @@ from ._adapters import (
     _invoke_action,
 )
 from ._utils import _ClientStatus
-from .filters import CustomScenarioFilter
+from .filters import CustomScenarioFilter, ParamType
 
 
 class _GuiCoreContext(CoreEventConsumerBase):
@@ -697,6 +697,25 @@ class _GuiCoreContext(CoreEventConsumerBase):
         # remove empty cycles
         return [e for e in filtered_list if isinstance(e, DataNode) or (isinstance(e, (tuple, list)) and len(e[2]))]
 
+    @staticmethod
+    def _get_sort_params(params: t.Optional[t.List[t.Any]] = None, parent: t.Optional[Scenario] = None):
+        args: t.Optional[t.List[t.Any]] = None
+        if params:
+            args = []
+            for param in params:
+                if param == ParamType.ScenarioConfigId.value:
+                    args.append(
+                        parent.config_id
+                        if isinstance(parent, Scenario)
+                        else next(filter(lambda id: id != "default", iter(Config.scenarios)), None)  # type: ignore[arg-type]
+                    )
+                elif param == ParamType.ScenarioId.value:
+                    args.append(parent.id if isinstance(parent, Scenario) else None)
+                else:
+                    args.append(None)
+        return args
+
+
     def get_sorted_datanode_list(
         self,
         entities: t.Union[
@@ -704,6 +723,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
         ],
         sorts: t.Optional[t.List[t.Dict[str, t.Any]]],
         adapt_dn=False,
+        parent: t.Optional[Scenario] = None,
     ):
         if not entities:
             return entities
@@ -712,7 +732,10 @@ class _GuiCoreContext(CoreEventConsumerBase):
             for sd in reversed(sorts):
                 col = sd.get("col", "")
                 order = sd.get("order", True)
-                sorted_list = sorted(sorted_list, key=_get_entity_property(col, DataNode), reverse=not order)
+                args = self._get_sort_params(t.cast(t.List[int], sd.get("params")), parent)
+                sorted_list = sorted(
+                    sorted_list, key=_get_entity_property(col, DataNode, params=args), reverse=not order
+                )
         else:
             sorted_list = entities
         return [self.data_node_adapter(e, sorts, adapt_dn) for e in sorted_list]
@@ -731,26 +754,39 @@ class _GuiCoreContext(CoreEventConsumerBase):
         sorts: t.Optional[t.List[t.Dict[str, t.Any]]],
     ):
         self.__lazy_start()
-        base_list = []
+        base_list: t.List[t.Union[Cycle, Scenario, DataNode]] = []
+        parent: t.Optional[Scenario] = None
         with self.lock:
             self.__do_datanodes_tree()
         if datanodes is None:
             if scenarios is None:
-                base_list = (self.data_nodes_by_owner or {}).get(None, []) + (
-                    self.get_scenarios(None, None, None) or []
-                )
+                tree: t.List[t.Union[Cycle, Scenario]] = []
+                with self.lock:
+                    # always needed to get scenarios for a cycle in cycle_adapter
+                    if self.scenario_by_cycle is None:
+                        self.scenario_by_cycle = get_cycles_scenarios()
+                    for cycle, c_scenarios in self.scenario_by_cycle.items():
+                        if cycle is None:
+                            tree.extend(c_scenarios)
+                        else:
+                            tree.append(cycle)
+                base_list = (self.data_nodes_by_owner or {}).get(None, []) + tree
             else:
                 if isinstance(scenarios, (list, tuple)) and len(scenarios) > 1:
                     base_list = list(scenarios)
                 else:
+                    parent = (
+                        scenarios[0]
+                        if scenarios and isinstance(scenarios, (list, tuple))
+                        else t.cast(Scenario, scenarios)
+                    )
                     if self.data_nodes_by_owner:
-                        owners = scenarios if isinstance(scenarios, (list, tuple)) else [scenarios]
-                        base_list = [d for owner in owners for d in (self.data_nodes_by_owner).get(owner.id, [])]
+                        base_list = t.cast(list, self.data_nodes_by_owner.get(parent.id, []))
                     else:
                         base_list = []
         else:
-            base_list = datanodes
-        adapted_list = self.get_sorted_datanode_list(t.cast(list, base_list), sorts)
+            base_list = t.cast(list, datanodes)
+        adapted_list = self.get_sorted_datanode_list(t.cast(list, base_list), sorts, parent=parent)
         return self.get_filtered_datanode_list(t.cast(list, adapted_list), filters)
 
     def data_node_adapter(
@@ -763,8 +799,12 @@ class _GuiCoreContext(CoreEventConsumerBase):
         if isinstance(data, tuple):
             raise NotImplementedError
         if isinstance(data, list):
-            if data[2] and isinstance(t.cast(list, data[2])[0], (Cycle, Scenario, Sequence, DataNode)):
-                data[2] = self.get_sorted_datanode_list(t.cast(list, data[2]), sorts, False)
+            if (
+                data[2]
+                and (parent := t.cast(Scenario, t.cast(list, data[2])[0]))
+                and isinstance(parent, (Cycle, Scenario, Sequence, DataNode))
+            ):
+                data[2] = self.get_sorted_datanode_list(t.cast(list, data[2]), sorts, False, parent=parent)
             return data
         try:
             if hasattr(data, "id") and is_readable(data.id) and core_get(data.id) is not None:
@@ -779,14 +819,15 @@ class _GuiCoreContext(CoreEventConsumerBase):
                     self.__do_datanodes_tree()
                 if self.data_nodes_by_owner:
                     if isinstance(data, Cycle):
+                        scenarios = (self.scenario_by_cycle or {}).get(data, [])
                         return [
                             data.id,
                             data.get_simple_label(),
                             self.get_sorted_datanode_list(
-                                self.data_nodes_by_owner.get(data.id, [])
-                                + (self.scenario_by_cycle or {}).get(data, []),
+                                self.data_nodes_by_owner.get(data.id, []) + scenarios,
                                 sorts,
                                 False,
+                                parent=scenarios[0] if scenarios else None,
                             ),
                             _EntityType.CYCLE.value,
                             False,
@@ -799,6 +840,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
                                 t.cast(list, self.data_nodes_by_owner.get(data.id, []) + list(data.sequences.values())),
                                 sorts,
                                 False,
+                                parent=data,
                             ),
                             _EntityType.SCENARIO.value,
                             data.is_primary,
@@ -808,7 +850,14 @@ class _GuiCoreContext(CoreEventConsumerBase):
                             return [
                                 data.id,
                                 data.get_simple_label(),
-                                self.get_sorted_datanode_list(datanodes, sorts, False),
+                                self.get_sorted_datanode_list(
+                                    datanodes,
+                                    sorts,
+                                    False,
+                                    parent=t.cast(
+                                        Scenario, core_get(t.cast(ScenarioId, data.owner_id)) if data.owner_id else None
+                                    ),
+                                ),
                                 _EntityType.SEQUENCE.value,
                             ]
         except Exception as e:
@@ -1050,7 +1099,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
                     if data.get("type") == "float"
                     else data.get("value"),
                     editor_id=self.gui._get_client_id(),
-                    comment=t.cast(dict, data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT)),
+                    comment=t.cast(str, data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT)),
                 )
                 _GuiCoreContext.__assign_var(state, error_var, "")
             except Exception as e:
@@ -1135,9 +1184,11 @@ class _GuiCoreContext(CoreEventConsumerBase):
                             "Error updating data node tabular value: type does not support at[] indexer.",
                         )
                 if new_data is not None:
-                    datanode.write(new_data,
-                                   editor_id=self.gui._get_client_id(),
-                                   comment=user_data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT))
+                    datanode.write(
+                        new_data,
+                        editor_id=self.gui._get_client_id(),
+                        comment=user_data.get(_GuiCoreContext.__PROP_ENTITY_COMMENT),
+                    )
                     _GuiCoreContext.__assign_var(state, error_var, "")
             except Exception as e:
                 _GuiCoreContext.__assign_var(state, error_var, f"Error updating data node tabular value. {e}")
@@ -1250,7 +1301,7 @@ class _GuiCoreContext(CoreEventConsumerBase):
                             act_payload.get("path", ""),
                             t.cast(t.Callable[[str, t.Any], bool], checker) if callable(checker) else None,
                             editor_id=self.gui._get_client_id(),
-                            comment=None
+                            comment=None,
                         )
                     ):
                         state.assign(error_id, f"Data unavailable: {reason.reasons}")
