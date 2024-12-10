@@ -52,6 +52,7 @@ const verticalDivStyle: CSSProperties = {
     flexDirection: "column",
     gap: 0,
 };
+const noPaddingYSx = {py: 0};
 
 const Input = (props: TaipyInputProps) => {
     const {
@@ -300,6 +301,7 @@ const Input = (props: TaipyInputProps) => {
                                     size="small"
                                     onMouseDown={handleUpStepperMouseDown}
                                     disabled={!active}
+                                    sx={noPaddingYSx}
                                 >
                                     <ArrowDropUpIcon fontSize="inherit" />
                                 </IconButton>
@@ -308,6 +310,7 @@ const Input = (props: TaipyInputProps) => {
                                     size="small"
                                     onMouseDown={handleDownStepperMouseDown}
                                     disabled={!active}
+                                    sx={noPaddingYSx}
                                 >
                                     <ArrowDropDownIcon fontSize="inherit" />
                                 </IconButton>
