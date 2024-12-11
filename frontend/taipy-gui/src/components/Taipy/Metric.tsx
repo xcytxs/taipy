@@ -56,6 +56,7 @@ const emptyLayout = {} as Partial<Layout>;
 const defaultStyle = { position: "relative", display: "inline-block", width: "100%" } as CSSProperties;
 const skeletonStyle = { ...defaultStyle, minHeight: "7em" };
 const plotConfig = { displaylogo: false };
+const boxStyle = { height: "100vh" };
 
 const Metric = (props: MetricProps) => {
     const { showValue = true } = props;
@@ -92,17 +93,17 @@ const Metric = (props: MetricProps) => {
         delta !== undefined && mode.push("delta");
         const deltaIncreasing = props.deltaColor
             ? {
-                  color: props.deltaColor == "invert" ? "#FF4136" : props.deltaColor,
-              }
+                color: props.deltaColor == "invert" ? "#FF4136" : props.deltaColor,
+            }
             : undefined;
         const deltaDecreasing =
             props.deltaColor == "invert"
                 ? {
-                      color: "#3D9970",
-                  }
+                    color: "#3D9970",
+                }
                 : props.negativeDeltaColor
-                  ? { color: props.negativeDeltaColor }
-                  : undefined;
+                    ? { color: props.negativeDeltaColor }
+                    : undefined;
         return [
             {
                 domain: { x: [0, 1], y: [0, 1] },
@@ -158,8 +159,6 @@ const Metric = (props: MetricProps) => {
     const layout = useMemo(() => {
         const layout = {
             ...baseLayout,
-            height: baseLayout.height !== undefined ? baseLayout.height : props.height,
-            width: baseLayout.width !== undefined ? baseLayout.width : props.width,
         };
         let template = undefined;
         try {
@@ -185,8 +184,6 @@ const Metric = (props: MetricProps) => {
         return layout as Partial<Layout>;
     }, [
         props.title,
-        props.height,
-        props.width,
         props.template,
         props.template_Dark_,
         props.template_Light_,
@@ -194,15 +191,35 @@ const Metric = (props: MetricProps) => {
         baseLayout,
     ]);
 
+    const style = useMemo(() => {
+        const normalizeSize = (val: string | number | undefined): string | undefined => {
+            if (typeof val === "number" || (typeof val === "string" && /^\d+$/.test(val))) {
+                return `${val}px`;
+            }
+            return val;
+        };
+
+        const width = props.width ? normalizeSize(props.width) : "100%";
+        const height = props.height ? normalizeSize(props.height) : undefined;
+
+        return { ...defaultStyle, width, height };
+    }, [props.width, props.height]);
+
     return (
-        <Tooltip title={hover || ""}>
-            <Box className={`${className} ${getComponentClassName(props.children)}`}>
-                <Suspense fallback={<Skeleton key="skeleton" sx={skeletonStyle} />}>
-                    <Plot data={data} layout={layout} style={defaultStyle} config={plotConfig} useResizeHandler />
-                </Suspense>
-                {props.children}
-            </Box>
-        </Tooltip>
+            <Tooltip title={hover || ""}>
+                <Box className={`${className} ${getComponentClassName(props.children)}`} style={boxStyle}>
+                    <Suspense fallback={<Skeleton key="skeleton" sx={skeletonStyle} />}>
+                        <Plot
+                            data={data}
+                            layout={layout}
+                            style={style}
+                            config={plotConfig}
+                            useResizeHandler
+                        />
+                    </Suspense>
+                    {props.children}
+                </Box>
+            </Tooltip>
     );
 };
 
