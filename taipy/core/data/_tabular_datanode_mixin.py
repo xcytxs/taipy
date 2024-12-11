@@ -26,7 +26,6 @@ class _TabularDataNodeMixin(object):
     _EXPOSED_TYPE_PANDAS = "pandas"
     _EXPOSED_TYPE_MODIN = "modin"  # Deprecated in favor of pandas since 3.1.0
     _VALID_STRING_EXPOSED_TYPES = [_EXPOSED_TYPE_PANDAS, _EXPOSED_TYPE_NUMPY]
-    _VALID_OTHER_EXPOSED_TYPES = [pd.DataFrame, np.ndarray]
     _EXPOSED_TYPE_PANDAS_DATAFRAME = pd.DataFrame
     _EXPOSED_TYPE_NUMPY_NDARRAY = np.ndarray
 

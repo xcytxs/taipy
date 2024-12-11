@@ -76,7 +76,6 @@ class DataNodeConfig(Section):
     _EXPOSED_TYPE_NUMPY = "numpy"
     _EXPOSED_TYPE_PANDAS_DATAFRAME = pandas.DataFrame
     _EXPOSED_TYPE_NUMPY_NDARRAY = numpy.ndarray
-    _EXPOSED_TYPE_LIST = List
     _DEFAULT_EXPOSED_TYPE = _EXPOSED_TYPE_PANDAS
 
     _ALL_EXPOSED_TYPES = [
@@ -84,7 +83,6 @@ class DataNodeConfig(Section):
         _EXPOSED_TYPE_NUMPY,
         _EXPOSED_TYPE_PANDAS_DATAFRAME,
         _EXPOSED_TYPE_NUMPY_NDARRAY,
-        _EXPOSED_TYPE_LIST,
     ]
 
     _OPTIONAL_ENCODING_PROPERTY = "encoding"
