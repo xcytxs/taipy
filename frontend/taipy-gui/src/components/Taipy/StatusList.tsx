@@ -12,6 +12,7 @@
  */
 
 import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
 import ArrowUpward from "@mui/icons-material/ArrowUpward";
@@ -19,7 +20,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Popover, { PopoverOrigin } from "@mui/material/Popover";
 
 import Status, { StatusType } from "./Status";
-import { TaipyBaseProps, TaipyHoverProps } from "./utils";
+import { getSuffixedClassNames, TaipyBaseProps, TaipyHoverProps } from "./utils";
 import { useClassNames, useDynamicProperty } from "../../utils/hooks";
 import { getComponentClassName } from "./TaipyStyle";
 
@@ -185,11 +186,11 @@ const StatusList = (props: StatusListProps) => {
 
     return (
         <Tooltip title={hover || ""}>
-            <>
+            <Box className={`${className} ${getComponentClassName(props.children)}`}>
                 <Status
                     id={props.id}
                     value={globStatus}
-                    className={`${className} ${getComponentClassName(props.children)}`}
+                    className={getSuffixedClassNames(className, "-main")}
                     {...globalProps}
                     icon={getIcon(icons, getStatusIntValue(globStatus.status))}
                 />
@@ -204,7 +205,7 @@ const StatusList = (props: StatusListProps) => {
                                         key={getId(props.id, idx)}
                                         id={getId(props.id, idx)}
                                         value={val}
-                                        className={`${className} ${getComponentClassName(props.children)}`}
+                                        className={getSuffixedClassNames(className, `-${idx}`)}
                                         {...closeProp}
                                         icon={getIcon(icons, getStatusIntValue(val.status))}
                                     />
@@ -213,7 +214,7 @@ const StatusList = (props: StatusListProps) => {
                     </Stack>
                 </Popover>
                 {props.children}
-            </>
+            </Box>
         </Tooltip>
     );
 };
