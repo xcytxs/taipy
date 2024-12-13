@@ -25,7 +25,7 @@ from taipy.core.data.pickle import PickleDataNode
 from taipy.core.job._job_manager_factory import _JobManagerFactory
 from taipy.core.scenario._scenario_manager_factory import _ScenarioManagerFactory
 from taipy.core.submission._submission_manager_factory import _SubmissionManagerFactory
-from taipy.core.submission.submission import Submission, SubmissionStatus
+from taipy.core.submission.submission import Submission
 from taipy.core.task._task_manager_factory import _TaskManagerFactory
 from taipy.gui import Gui, State
 from taipy.gui_core._context import _GuiCoreContext
@@ -204,7 +204,7 @@ class TestGuiCoreContext_is_readable:
             mockGui._get_authorization = lambda s: contextlib.nullcontext()
             gui_core_context = _GuiCoreContext(mockGui)
 
-            gui_core_context.client_submission[a_submission.id] = _ClientStatus("client_id", SubmissionStatus.UNDEFINED)
+            gui_core_context.client_submission[a_submission.id] = _ClientStatus("client_id", None)
             gui_core_context.submission_status_callback(a_submission.id)
             mockget.assert_called()
             found = False

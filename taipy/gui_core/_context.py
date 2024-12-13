@@ -639,11 +639,10 @@ class _GuiCoreContext(CoreEventConsumerBase):
                     client_id=self.gui._get_client_id(),
                     module_context=self.gui._get_locals_context(),
                 )
-                client_status = _ClientStatus(self.gui._get_client_id(), submission_entity.submission_status)
+                client_status = _ClientStatus(self.gui._get_client_id(), None)
                 with self.submissions_lock:
                     self.client_submission[submission_entity.id] = client_status
                 if Config.core.mode == "development":
-                    client_status.submission_status = SubmissionStatus.SUBMITTED
                     self.submission_status_callback(submission_entity.id)
                 _GuiCoreContext.__assign_var(state, error_var, "")
         except Exception as e:
@@ -714,7 +713,6 @@ class _GuiCoreContext(CoreEventConsumerBase):
                 else:
                     args.append(None)
         return args
-
 
     def get_sorted_datanode_list(
         self,
