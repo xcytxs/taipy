@@ -52,11 +52,22 @@ interface MetricProps extends TaipyBaseProps, TaipyHoverProps {
     template_Light_?: string;
 }
 
-const emptyLayout = {} as Partial<Layout>;
-const defaultStyle = { position: "relative", display: "inline-block", width: "100%" } as CSSProperties;
+const defaultLayout = { margin: { l: 50, r: 50, t: 50, b: 50 } } as Partial<Layout>;
+const defaultStyle = {
+    position: "relative",
+    display: "inline-block",
+    width: "20vw",
+    height: "20vh",
+} as CSSProperties;
 const skeletonStyle = { ...defaultStyle, minHeight: "7em" };
 const plotConfig = { displaylogo: false };
-const boxStyle = { height: "100vh" };
+
+const normalizeSize = (val: string | number | undefined): string | undefined => {
+    if (typeof val === "number" || (typeof val === "string" && /^\d+$/.test(val))) {
+        return `${val}px`;
+    }
+    return val;
+};
 
 const Metric = (props: MetricProps) => {
     const { showValue = true } = props;
@@ -64,7 +75,7 @@ const Metric = (props: MetricProps) => {
     const threshold = useDynamicProperty(props.threshold, props.defaultThreshold, undefined);
     const delta = useDynamicProperty(props.delta, props.defaultDelta, undefined);
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
-    const baseLayout = useDynamicJsonProperty(props.layout, props.defaultLayout || "", emptyLayout);
+    const baseLayout = useDynamicJsonProperty(props.layout, props.defaultLayout || "", defaultLayout);
     const hover = useDynamicProperty(props.hoverText, props.defaultHoverText, undefined);
     const theme = useTheme();
 
@@ -192,34 +203,27 @@ const Metric = (props: MetricProps) => {
     ]);
 
     const style = useMemo(() => {
-        const normalizeSize = (val: string | number | undefined): string | undefined => {
-            if (typeof val === "number" || (typeof val === "string" && /^\d+$/.test(val))) {
-                return `${val}px`;
-            }
-            return val;
-        };
-
-        const width = props.width ? normalizeSize(props.width) : "100%";
-        const height = props.height ? normalizeSize(props.height) : undefined;
+        const width = props.width ? normalizeSize(props.width) : defaultStyle.width;
+        const height = props.height ? normalizeSize(props.height) : defaultStyle.height;
 
         return { ...defaultStyle, width, height };
     }, [props.width, props.height]);
 
     return (
-            <Tooltip title={hover || ""}>
-                <Box className={`${className} ${getComponentClassName(props.children)}`} style={boxStyle}>
-                    <Suspense fallback={<Skeleton key="skeleton" sx={skeletonStyle} />}>
-                        <Plot
-                            data={data}
-                            layout={layout}
-                            style={style}
-                            config={plotConfig}
-                            useResizeHandler
-                        />
-                    </Suspense>
-                    {props.children}
-                </Box>
-            </Tooltip>
+        <Tooltip title={hover || ""}>
+            <Box className={`${className} ${getComponentClassName(props.children)}`}>
+                <Suspense fallback={<Skeleton key="skeleton" sx={skeletonStyle} />}>
+                    <Plot
+                        data={data}
+                        layout={layout}
+                        style={style}
+                        config={plotConfig}
+                        useResizeHandler
+                    />
+                </Suspense>
+                {props.children}
+            </Box>
+        </Tooltip>
     );
 };
 
