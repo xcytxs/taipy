@@ -212,7 +212,7 @@ describe("Chat Component", () => {
         });
         jest.restoreAllMocks();
     });
-    it("Not upload image over a file size limit", async () => {
+    it("does not upload image over a file size limit", async () => {
         const dispatch = jest.fn();
         const state: TaipyState = INITIAL_STATE;
         const { getByText, getByAltText } = render(
