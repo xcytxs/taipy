@@ -19,9 +19,7 @@ def test_has_default_value(page: Page, gui: Gui, helpers):
         (1864, 55.03),
     ]
     data = pandas.DataFrame(percentages, columns=["Year", "%"]) # noqa: F841
-    page_md = """
-<|{data}|chart|type=bar|x=Year|y=%|>
-"""
+    page_md = "<|{data}|chart|type=bar|x=Year|y=%|>"
     gui._set_frame(inspect.currentframe())
     gui.add_page(name="test",page=page_md)
     helpers.run_e2e(gui)
@@ -36,4 +34,4 @@ def test_has_default_value(page: Page, gui: Gui, helpers):
     page.set_viewport_size({"width": 1920, "height": 1080})
     page.wait_for_timeout(1000)
     box_after = first_element.bounding_box()
-    assert box_after['width'] > box_before['width']
+    assert box_after["width"] > box_before["width"]

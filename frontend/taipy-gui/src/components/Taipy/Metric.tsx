@@ -56,6 +56,9 @@ const defaultLayout = { margin: { l: 50, r: 50, t: 50, b: 50 } } as Partial<Layo
 const defaultStyle = {
     position: "relative",
     display: "inline-block",
+    /*
+    * When updating the width and height, be sure to adjust the corresponding Metric values in the viselements.json file accordingly.
+    * */
     width: "20vw",
     height: "20vh",
 } as CSSProperties;
