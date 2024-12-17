@@ -280,8 +280,8 @@ const updateArrays = (sel: number[][], val: number[], idx: number) => {
     return sel;
 };
 
-const getDataKey = (columns: Record<string, ColumnDesc>, decimators?: string[]): [string[], string] => {
-    const backCols = Object.values(columns).map((col) => col.dfid);
+const getDataKey = (columns?: Record<string, ColumnDesc>, decimators?: string[]): [string[], string] => {
+    const backCols = columns ? Object.values(columns).map((col) => col.dfid) : [];
     return [backCols, backCols.join("-") + (decimators ? `--${decimators.join("")}` : "")];
 };
 

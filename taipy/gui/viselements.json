@@ -2018,7 +2018,8 @@
                         "name": "height",
                         "type": "Union[str,int,float]",
                         "doc": "The height of the dialog, in CSS units."
-                    }
+                    },
+                    {"name": "ref_id", "type": "dynamic(str)", "doc": "TODO an id or a query selector that allows to identify an HTML component that would be the anchor for the dialog."}
                 ]
             }
         ],

@@ -215,6 +215,8 @@ class _Factory:
                 ("width", PropertyType.string_or_number),
                 ("height", PropertyType.string_or_number),
                 ("hover_text", PropertyType.dynamic_string),
+                ("ref_id", PropertyType.dynamic_string),
+                ("popup", PropertyType.boolean),
             ]
         )
         ._set_propagate(),
