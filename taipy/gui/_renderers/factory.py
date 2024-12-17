@@ -349,6 +349,7 @@ class _Factory:
             [
                 ("message", PropertyType.dynamic_string),
                 ("on_action", PropertyType.function, "on_login"),
+                ("labels", PropertyType.string_list),
             ]
         ),
         "menu": lambda gui, control_type, attrs: _Builder(

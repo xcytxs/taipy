@@ -1760,6 +1760,11 @@
                         "name": "message",
                         "type": "dynamic(str)",
                         "doc": "The message shown in the dialog."
+                    },
+                    {
+                        "name": "labels",
+                        "type": "Union[str,list[str]]",
+                        "doc": "A list of labels to show in a row of buttons at the bottom of the dialog. The index of the button in the list is reported as args in the <code>on_action</code> callback (that index is -1 for the <i>close</i> icon)."
                     }
                 ]
             }
