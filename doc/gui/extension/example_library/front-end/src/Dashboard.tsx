@@ -12,15 +12,12 @@
  */
 
 import React, { useMemo } from "react";
-import {
-    TaipyDynamicProps,
-    useDynamicJsonProperty,
-} from "taipy-gui";
+import { useDynamicJsonProperty, } from "taipy-gui";
 
 import Plot from "react-plotly.js";
 import { Data, Layout } from "plotly.js";
 
-interface DashboardProps extends TaipyDynamicProps {
+interface DashboardProps {
     data?: string;
     defaultData?: string;
     layout?: string;
