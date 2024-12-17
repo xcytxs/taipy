@@ -313,11 +313,9 @@ class TestTaskConfigChecker:
         assert len(Config._collector.warnings) == 2
 
     def test_check_required_property(self, caplog):
-        from taipy.core.config.checkers._task_config_checker import _TaskConfigChecker
+        prev_required_properties = TaskConfig._REQUIRED_PROPERTIES.copy()
 
-        prev_required_properties = _TaskConfigChecker._REQUIRED_PROPERTIES.copy()
-
-        _TaskConfigChecker._REQUIRED_PROPERTIES = {"task_type": ["required_key_1", "required_key_2"]}
+        TaskConfig._REQUIRED_PROPERTIES = {"task_type": ["required_key_1", "required_key_2"]}
 
         config = Config._applied_config
         Config._compile_configs()
@@ -347,4 +345,4 @@ class TestTaskConfigChecker:
         assert expected_error_message_2 in caplog.text
         assert len(Config._collector.warnings) == 1
 
-        _TaskConfigChecker._REQUIRED_PROPERTIES = prev_required_properties
+        TaskConfig._REQUIRED_PROPERTIES = prev_required_properties
