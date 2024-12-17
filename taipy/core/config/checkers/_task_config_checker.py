@@ -21,9 +21,6 @@ from ..task_config import TaskConfig
 
 
 class _TaskConfigChecker(_ConfigChecker):
-    # NOTE: # {task_type: ["required_key1"]}
-    _REQUIRED_PROPERTIES: Dict[str, List[str]] = {}
-
     def __init__(self, config: _Config, collector: IssueCollector):
         super().__init__(config, collector)
 
@@ -95,7 +92,7 @@ class _TaskConfigChecker(_ConfigChecker):
 
     def _check_required_properties(self, task_config_id: str, task_config: TaskConfig):
         task_config_properties = task_config.properties
-        for task_type, required_keys in self._REQUIRED_PROPERTIES.items():
+        for task_type, required_keys in TaskConfig._REQUIRED_PROPERTIES.items():
             if task_config_properties.get(task_type, False):
                 for required_key in required_keys:
                     if task_config_properties.get(required_key, None) is None:
