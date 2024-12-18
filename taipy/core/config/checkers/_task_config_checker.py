@@ -99,6 +99,6 @@ class _TaskConfigChecker(_ConfigChecker):
                         self._error(
                             required_key,
                             None,
-                            f"TaskConfig `{task_config_id}` is either missing the required "
-                            f"property `{required_key}` or the value is set to None.",
+                            f"TaskConfig `{task_config_id}` is either missing the required property "
+                            f"`{required_key}` or the value is set to None.",
                         )
