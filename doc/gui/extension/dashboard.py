@@ -12,19 +12,19 @@ from example_library import ExampleLibrary
 
 from taipy.gui import Gui
 
-trace1 = {
+set1 = {
     "x": [1, 2, 3, 4, 4, 4, 8, 9, 10],
     "type": "box",
     "name": "Set 1"
 }
 
-trace2 = {
+set2 = {
     "x": [2, 3, 3, 3, 3, 5, 6, 6, 7],
     "type": "box",
     "name": "Set 2"
 }
 
-data = [trace1, trace2]
+data = [set1, set2]
 
 layout = {
     "title": {
@@ -37,4 +37,4 @@ page = """
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Horizontal Box Plot")
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Horizontal Box Plot", port=3010)
