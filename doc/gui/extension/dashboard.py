@@ -37,4 +37,4 @@ page = """
 """
 
 if __name__ == "__main__":
-    Gui(page, libraries=[ExampleLibrary()]).run(title="Horizontal Box Plot", port=3010)
+    Gui(page, libraries=[ExampleLibrary()]).run(title="Horizontal Box Plot")
