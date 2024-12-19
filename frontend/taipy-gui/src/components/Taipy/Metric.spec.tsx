@@ -274,14 +274,13 @@ describe("Metric Component", () => {
         });
     });
 
-    it("applies style correctly when height is undefined", async () => {
+    it("applies style correctly when height and width are undefined", async () => {
         const { container } = render(<Metric />);
         await waitFor(() => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
-                width: "100%",
-                position: "relative",
-                display: "inline-block",
+                width: "20vw",
+                height: "20vh",
             });
         });
     });
@@ -291,10 +290,7 @@ describe("Metric Component", () => {
         await waitFor(() => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
-                width: "100%",
                 height: "100px",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -304,10 +300,7 @@ describe("Metric Component", () => {
         await waitFor(() => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
-                width: "100%",
                 height: "30em",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -317,10 +310,7 @@ describe("Metric Component", () => {
         await waitFor(() => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
-                width: "100%",
                 height: "30%",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -330,10 +320,7 @@ describe("Metric Component", () => {
         await waitFor(() => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
-                width: "100%",
                 height: "30vh",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -343,10 +330,7 @@ describe("Metric Component", () => {
         await waitFor(() => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
-                width: "100%",
                 height: "30vw",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -357,8 +341,6 @@ describe("Metric Component", () => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
                 width: "100px",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -369,8 +351,6 @@ describe("Metric Component", () => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
                 width: "30em",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -381,8 +361,6 @@ describe("Metric Component", () => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
                 width: "30%",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -393,8 +371,6 @@ describe("Metric Component", () => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
                 width: "30vh",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
@@ -405,8 +381,6 @@ describe("Metric Component", () => {
             const elt = container.querySelector(".js-plotly-plot");
             expect(elt).toHaveStyle({
                 width: "30vw",
-                position: "relative",
-                display: "inline-block",
             });
         });
     });
