@@ -65,6 +65,13 @@ class ExampleLibrary(ElementLibrary):
                     "text": ElementProperty(PropertyType.string),
                     "logo_path": ElementProperty(PropertyType.string, default_value=logo_base64),
                 },
+            ),
+            "dashboard": Element(
+                "data",
+                {
+                    "data": ElementProperty(PropertyType.dict),
+                    "layout": ElementProperty(PropertyType.dict),
+                },
             )
         }
 
