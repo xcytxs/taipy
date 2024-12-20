@@ -187,7 +187,7 @@ class Gui:
         env_filename: t.Optional[str] = None,
         libraries: t.Optional[t.List[ElementLibrary]] = None,
         flask: t.Optional[Flask] = None,
-        assets_url_path: t.Optional[t.Union[str, t.List[str]]] = None,
+        script_paths: t.Optional[t.Union[str, t.List[t.Union[str, Path]]]] = None
     ):
         """Initialize a new Gui instance.
 
@@ -242,8 +242,8 @@ class Gui:
         self._set_css_file(css_file)
 
         # Set the assets URL path
-        self._assets_url_path = assets_url_path
-        self._load_assets_script()
+        self.__script_files = []
+        self._load_scripts(script_paths)
 
 
         # Preserve server config for server initialization
@@ -420,29 +420,31 @@ class Gui:
             for library in libraries:
                 Gui.add_library(library)
 
-    def _load_assets_script(self):
-        self.__script_files = []
-        if self._assets_url_path is None:
+    def _load_scripts(self, script_paths: t.Optional[t.Union[str, t.List[t.Union[str, Path]]]]):
+        if script_paths is None:
             return
 
-        if isinstance(self._assets_url_path, str):
-            assets_paths = [self._assets_url_path]
-        elif isinstance(self._assets_url_path, list):
-            assets_paths = self._assets_url_path
-        else:
-            assets_paths = []
+        if isinstance(script_paths, (str, Path)):
+            script_paths = [script_paths]
 
-        for path in assets_paths:
-            assets_path = Path(path)
-            if assets_path.exists() and assets_path.is_file() and assets_path.suffix == ".js":
-                self.__script_files.append(str(assets_path))
-            elif path.startswith("http://") or path.startswith("https://"):
-                self.__script_files.append(path)
-            else:
-                raise ValueError(f"Assets path '{path}' does not exist, is not a file, or is not a JavaScript file.")
+        for script_path in script_paths:
+            self._load_script(script_path)
 
         if not self.__script_files:
-            raise Exception("No JavaScript files found in the specified assets paths.")
+            raise Exception("No JavaScript files found in the specified script paths.")
+
+    def _load_script(self, script_path: t.Union[str, Path]):
+        if isinstance(script_path, str):
+            parsed_url = urlparse(script_path)
+            if parsed_url.netloc:
+                self.__script_files.append(script_path)
+                return
+            script_path = Path(script_path)
+
+        if script_path.exists() and script_path.is_file() and script_path.suffix == ".js":
+            self.__script_files.append(str(script_path))
+        else:
+            raise ValueError(f"Script path '{script_path}' does not exist, is not a file, or is not a JavaScript file.")
 
 
     @staticmethod
