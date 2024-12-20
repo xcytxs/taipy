@@ -421,6 +421,10 @@ class Gui:
                 Gui.add_library(library)
 
     def _load_assets_script(self):
+        self.__script_files = []
+        if self._assets_url_path is None:
+            return
+
         if isinstance(self._assets_url_path, str):
             assets_paths = [self._assets_url_path]
         elif isinstance(self._assets_url_path, list):
@@ -428,7 +432,6 @@ class Gui:
         else:
             assets_paths = []
 
-        self.__script_files = []
         for path in assets_paths:
             assets_path = Path(path)
             if assets_path.exists() and assets_path.is_file() and assets_path.suffix == ".js":
@@ -2761,7 +2764,7 @@ class Gui:
         if self.__css_file:
             styles.append(f"{self.__css_file}")
 
-        if self.__script_files:
+        if self.__script_files is not None:
             if len(self.__script_files) == 1:
                 scripts.append(self.__script_files[0])
             else:
