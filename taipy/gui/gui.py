@@ -424,9 +424,7 @@ class Gui:
         assets_path = Path(self._assets_url_path)
         if not assets_path.exists() or not assets_path.is_dir():
             raise ValueError(f"Assets folder '{self._assets_url_path}' does not exist or is not a directory.")
-
-        self.__script_files = [script_file for script_file in assets_path.glob("*.js")]
-
+        self.__script_files = list(assets_path.glob("*.js"))
         if not self.__script_files:
             raise Exception(f"No JavaScript files found in the assets folder '{self._assets_url_path}'.")
 
