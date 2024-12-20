@@ -232,9 +232,9 @@ class Gui:
                 If this argument is set, this `Gui` instance will use the value of this argument
                 as the underlying server. If omitted or set to None, this `Gui` will create its
                 own Flask application instance and use it to serve the pages.
-            assets_url_path (Optional[Union[str, List[str]]]): Specifies the path(s) to the JavaScript files
-            or external resources used by the application.
-            It can be a single URL or path, or a list containing multiple URLs and/or paths.
+            script_paths (Optional[Union[str, List[Union[str, Path]]]]): Specifies the path(s) to the JavaScript files
+                or external resources used by the application.
+                It can be a single URL or path, or a list containing multiple URLs and/or paths.
         """
         # store suspected local containing frame
         self.__frame = t.cast(FrameType, t.cast(FrameType, currentframe()).f_back)
