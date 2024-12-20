@@ -187,7 +187,7 @@ class Gui:
         env_filename: t.Optional[str] = None,
         libraries: t.Optional[t.List[ElementLibrary]] = None,
         flask: t.Optional[Flask] = None,
-        assets_url_path: t.Optional[str] = None,
+        assets_url_path: t.Optional[t.Union[str, t.List[str]]] = None,
     ):
         """Initialize a new Gui instance.
 
@@ -232,8 +232,9 @@ class Gui:
                 If this argument is set, this `Gui` instance will use the value of this argument
                 as the underlying server. If omitted or set to None, this `Gui` will create its
                 own Flask application instance and use it to serve the pages.
-            assets_url_path (Optional[str]): The path to the assets folder that contains the
-                JavaScript files used by the application.<br/>
+            assets_url_path (Optional[Union[str, List[str]]]): Specifies the path(s) to the JavaScript files
+            or external resources used by the application.
+            It can be a single URL or path, or a list containing multiple URLs and/or paths.
         """
         # store suspected local containing frame
         self.__frame = t.cast(FrameType, t.cast(FrameType, currentframe()).f_back)
@@ -242,7 +243,6 @@ class Gui:
 
         # Set the assets URL path
         self._assets_url_path = assets_url_path
-        self.__script_files: t.List[Path] = []
         self._load_assets_script()
 
 
@@ -421,12 +421,25 @@ class Gui:
                 Gui.add_library(library)
 
     def _load_assets_script(self):
-        assets_path = Path(self._assets_url_path)
-        if not assets_path.exists() or not assets_path.is_dir():
-            raise ValueError(f"Assets folder '{self._assets_url_path}' does not exist or is not a directory.")
-        self.__script_files = list(assets_path.glob("*.js"))
+        if isinstance(self._assets_url_path, str):
+            assets_paths = [self._assets_url_path]
+        elif isinstance(self._assets_url_path, list):
+            assets_paths = self._assets_url_path
+        else:
+            assets_paths = []
+
+        self.__script_files = []
+        for path in assets_paths:
+            assets_path = Path(path)
+            if assets_path.exists() and assets_path.is_file() and assets_path.suffix == ".js":
+                self.__script_files.append(str(assets_path))
+            elif path.startswith("http://") or path.startswith("https://"):
+                self.__script_files.append(path)
+            else:
+                raise ValueError(f"Assets path '{path}' does not exist, is not a file, or is not a JavaScript file.")
+
         if not self.__script_files:
-            raise Exception(f"No JavaScript files found in the assets folder '{self._assets_url_path}'.")
+            raise Exception("No JavaScript files found in the specified assets paths.")
 
 
     @staticmethod
