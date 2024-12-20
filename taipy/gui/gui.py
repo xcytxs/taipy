@@ -187,6 +187,7 @@ class Gui:
         env_filename: t.Optional[str] = None,
         libraries: t.Optional[t.List[ElementLibrary]] = None,
         flask: t.Optional[Flask] = None,
+        assets_url_path: t.Optional[str] = None,
     ):
         """Initialize a new Gui instance.
 
@@ -231,11 +232,19 @@ class Gui:
                 If this argument is set, this `Gui` instance will use the value of this argument
                 as the underlying server. If omitted or set to None, this `Gui` will create its
                 own Flask application instance and use it to serve the pages.
+            assets_url_path (Optional[str]): The path to the assets folder that contains the
+                JavaScript files used by the application.<br/>
         """
         # store suspected local containing frame
         self.__frame = t.cast(FrameType, t.cast(FrameType, currentframe()).f_back)
         self.__default_module_name = _get_module_name_from_frame(self.__frame)
         self._set_css_file(css_file)
+
+        # Set the assets URL path
+        self._assets_url_path = assets_url_path
+        self.__script_files: t.List[Path] = []
+        self._load_assets_script()
+
 
         # Preserve server config for server initialization
         if path_mapping is None:
@@ -410,6 +419,17 @@ class Gui:
         if libraries is not None:
             for library in libraries:
                 Gui.add_library(library)
+
+    def _load_assets_script(self):
+        assets_path = Path(self._assets_url_path)
+        if not assets_path.exists() or not assets_path.is_dir():
+            raise ValueError(f"Assets folder '{self._assets_url_path}' does not exist or is not a directory.")
+
+        self.__script_files = [script_file for script_file in assets_path.glob("*.js")]
+
+        if not self.__script_files:
+            raise Exception(f"No JavaScript files found in the assets folder '{self._assets_url_path}'.")
+
 
     @staticmethod
     def add_library(library: ElementLibrary) -> None:
@@ -2729,6 +2749,12 @@ class Gui:
             styles.append(Gui.__ROBOTO_FONT)
         if self.__css_file:
             styles.append(f"{self.__css_file}")
+
+        if self.__script_files:
+            if len(self.__script_files) == 1:
+                scripts.append(self.__script_files[0])
+            else:
+                scripts.extend(self.__script_files)
 
         self._flask_blueprint.append(extension_bp)
 
