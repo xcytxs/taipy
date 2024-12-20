@@ -242,7 +242,7 @@ class Gui:
         self._set_css_file(css_file)
 
         # Set the assets URL path
-        self.__script_files = []
+        self.__script_files: list[str] = []
         self._load_scripts(script_paths)
 
 
