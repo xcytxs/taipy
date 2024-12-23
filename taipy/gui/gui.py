@@ -1205,8 +1205,7 @@ class Gui:
             The transformed data or None if no transformation is possible.
         """
         try:
-            return Gui.__unsupported_data_converter(value) if _is_function(
-                Gui.__unsupported_data_converter) else None  # type: ignore
+            return Gui.__unsupported_data_converter(value) if _is_function(Gui.__unsupported_data_converter) else None  # type: ignore
         except Exception as e:
             _warn(f"Error transforming data: {str(e)}")
             return None
@@ -1235,9 +1234,7 @@ class Gui:
                             if ret_payload:
                                 break
                         except Exception as e:  # pragma: no cover
-                            _warn(
-                                f"Exception raised in '{lib_name}.get_data({lib_name}, payload, {user_var_name}, value)'",
-                                # noqa: E501
+                            _warn(f"Exception raised in '{lib_name}.get_data({lib_name}, payload, {user_var_name}, value)'",# noqa: E501
                                 e,
                             )
             if not isinstance(ret_payload, dict):
@@ -2060,8 +2057,7 @@ class Gui:
             raise Exception("name is required for add_page() function.")
         if not Gui.__RE_PAGE_NAME.match(name):  # pragma: no cover
             raise SyntaxError(
-                f'Page name "{name}" is invalid. It must only contain letters, digits, dash (-), underscore (_), and forward slash (/) characters.'
-                # noqa: E501
+                f'Page name "{name}" is invalid. It must only contain letters, digits, dash (-), underscore (_), and forward slash (/) characters.'# noqa: E501
             )
         if name.startswith("/"):  # pragma: no cover
             raise SyntaxError(f'Page name "{name}" cannot start with forward slash (/) character.')
@@ -2259,8 +2255,7 @@ class Gui:
                 self._bind(encoded_var_name, bind_locals[var_name])
             else:
                 _warn(
-                    f"Variable '{var_name}' is not available in either the '{self._get_locals_context()}' or '__main__' modules."
-                    # noqa: E501
+                    f"Variable '{var_name}' is not available in either the '{self._get_locals_context()}' or '__main__' modules."# noqa: E501
                 )
         return encoded_var_name
 
@@ -2629,8 +2624,7 @@ class Gui:
                 _warn(f"Using webapp_path: '{_conf_webapp_path}'.")
             else:  # pragma: no cover
                 _warn(
-                    f"webapp_path: '{_conf_webapp_path}' is not a valid directory. Falling back to '{_webapp_path}'."
-                    # noqa: E501
+                    f"webapp_path: '{_conf_webapp_path}' is not a valid directory. Falling back to '{_webapp_path}'."# noqa: E501
                 )
         return _webapp_path
 
@@ -2702,8 +2696,7 @@ class Gui:
             if not util.find_spec("pyngrok"):
                 raise RuntimeError("Cannot use ngrok as pyngrok package is not installed.")
             ngrok.set_auth_token(token)  # type: ignore[reportPossiblyUnboundVariable]
-            self._ngrok = (
-                ngrok.connect(app_config.get("port"), "http"), token)  # type: ignore[reportPossiblyUnboundVariable]
+            self._ngrok = (ngrok.connect(app_config.get("port"), "http"), token)  # type: ignore[reportPossiblyUnboundVariable]
             _TaipyLogger._get_logger().info(f" * NGROK Public Url: {self._ngrok[0].public_url}")
 
     def __bind_default_function(self):
@@ -2946,8 +2939,7 @@ class Gui:
                             glob_ctx[lib_context[0]] = lib_context[1]
                     elif lib_context:
                         _warn(
-                            f"Method {name}.on_init() should return a Tuple[str, Any] where the first element must be a valid Python identifier."
-                            # noqa: E501
+                            f"Method {name}.on_init() should return a Tuple[str, Any] where the first element must be a valid Python identifier."# noqa: E501
                         )
                 except Exception as e:  # pragma: no cover
                     if not self._call_on_exception(f"{name}.on_init", e):
