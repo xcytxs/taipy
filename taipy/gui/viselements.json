@@ -814,7 +814,7 @@
                     {
                         "name": "width[<i>column_name</i>]",
                         "type": "str",
-                        "doc": "The width of the indicated column, in CSS units."
+                        "doc": "The width of the indicated column, in CSS units (% values are not supported)."
                     },
                     {
                         "name": "selected",
@@ -1076,6 +1076,12 @@
                         "type": "bool",
                         "default_value": "False",
                         "doc": "If True, boolean values are rendered as a simple HTML checkbox."
+                    },
+                    {
+                        "name": "sortable",
+                        "type": "bool",
+                        "default_value": "True",
+                        "doc": "If False, the table provides no sorting capability. Individual columns can override this global setting, allowing specific columns to be marked as sortable or non-sortable regardless of value of <i>sortable</i>, by setting the <i>sortable</i> property to True or False accordingly, in the dictionary for that column in the <i>columns</i> property value."
                     }
                 ]
             }
