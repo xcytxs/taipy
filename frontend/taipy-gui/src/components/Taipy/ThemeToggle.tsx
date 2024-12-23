@@ -20,14 +20,14 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import WbSunny from "@mui/icons-material/WbSunny";
 import Brightness3 from "@mui/icons-material/Brightness3";
 
-import { TaipyActiveProps, getCssSize } from "./utils";
+import { TaipyActiveProps, TaipyChangeProps, getCssSize } from "./utils";
 import { TaipyContext } from "../../context/taipyContext";
-import { createThemeAction } from "../../context/taipyReducers";
-import { useClassNames } from "../../utils/hooks";
+import { createSendUpdateAction, createThemeAction } from "../../context/taipyReducers";
+import { useClassNames, useModule } from "../../utils/hooks";
 import { getLocalStorageValue } from "../../context/utils";
 import { getComponentClassName } from "./TaipyStyle";
 
-interface ThemeToggleProps extends TaipyActiveProps {
+interface ThemeToggleProps extends TaipyActiveProps, TaipyChangeProps {
     style?: SxProps;
     label?: string;
     width?: string | number;
@@ -53,11 +53,29 @@ const ThemeToggle = (props: ThemeToggleProps) => {
     const { id, label = "Mode", style = emptyStyle, active = true } = props;
     const { state, dispatch } = useContext(TaipyContext);
 
+    const module = useModule();
+
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
+
+    const updateBoundValue = useCallback(
+        (val: PaletteMode) => {
+            if (!props.updateVarName) {
+                return;
+            }
+            dispatch(
+                createSendUpdateAction(props.updateVarName, val === "dark", module, props.onChange, props.propagate),
+            );
+        },
+        [dispatch, props.updateVarName, props.onChange, props.propagate, module],
+    );
+
+    useEffect(() => {
+        updateBoundValue(state.theme.palette.mode);
+    }, [state.theme.palette.mode, updateBoundValue]);
 
     const changeMode = useCallback(
         (evt: MouseEvent, mode: PaletteMode) => mode !== null && dispatch(createThemeAction(mode === "dark")),
-        [dispatch]
+        [dispatch],
     );
 
     useEffect(() => {
@@ -72,7 +90,7 @@ const ThemeToggle = (props: ThemeToggleProps) => {
             props.width
                 ? ({ ...boxSx, ...style, width: getCssSize(props.width) } as SxProps)
                 : ({ ...boxSx, ...style } as SxProps),
-        [style, props.width]
+        [style, props.width],
     );
 
     return (

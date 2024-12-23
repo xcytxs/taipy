@@ -2149,7 +2149,7 @@
                         "name": "value",
                         "default_property": true,
                         "type": "dynamic(Any)",
-                        "doc": "Bound to the selection value."
+                        "doc": "Bound to the selection value.<br/>If this is used for theme toggling, it must be a Boolean value: True indicates that the current theme is set to \"dark\", while False indicates that the theme is set to \"light\"."
                     },
                     {
                         "name": "lov",
