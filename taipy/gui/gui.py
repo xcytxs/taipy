@@ -187,7 +187,7 @@ class Gui:
         env_filename: t.Optional[str] = None,
         libraries: t.Optional[t.List[ElementLibrary]] = None,
         flask: t.Optional[Flask] = None,
-        script_paths: t.Optional[t.Union[str, t.List[t.Union[str, Path]]]] = None
+        script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]] = None
     ):
         """Initialize a new Gui instance.
 
@@ -232,7 +232,7 @@ class Gui:
                 If this argument is set, this `Gui` instance will use the value of this argument
                 as the underlying server. If omitted or set to None, this `Gui` will create its
                 own Flask application instance and use it to serve the pages.
-            script_paths (Optional[Union[str, List[Union[str, Path]]]]): Specifies the path(s) to the JavaScript files
+            script_paths (Optional[Union[str, Path, List[Union[str, Path]]]]): Specifies the path(s) to the JavaScript files
                 or external resources used by the application.
                 It can be a single URL or path, or a list containing multiple URLs and/or paths.
         """
@@ -243,8 +243,7 @@ class Gui:
 
         # Set the assets URL path
         self.__script_files: list[str] = []
-        self._load_scripts(script_paths)
-
+        self.__load_scripts(script_paths)
 
         # Preserve server config for server initialization
         if path_mapping is None:
@@ -420,32 +419,31 @@ class Gui:
             for library in libraries:
                 Gui.add_library(library)
 
-    def _load_scripts(self, script_paths: t.Optional[t.Union[str, t.List[t.Union[str, Path]]]]):
+    def __load_scripts(self, script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]]):
+        def load_script(path: t.Union[str, Path]):
+            if isinstance(path, str):
+                parsed_url = urlparse(path)
+                if parsed_url.netloc:
+                    self.__script_files.append(path)
+                    return
+                path = Path(path)
+
+            if isinstance(path, Path) and path.exists() and path.is_file() and path.suffix == ".js":
+                self.__script_files.append(str(path))
+            else:
+                _warn(f"Script path '{path}' does not exist, is not a file, or is not a JavaScript file.")
+
         if script_paths is None:
             return
-
-        if isinstance(script_paths, (str, Path)):
-            script_paths = [script_paths]
-
-        for script_path in script_paths:
-            self._load_script(script_path)
-
-        if not self.__script_files:
-            raise Exception("No JavaScript files found in the specified script paths.")
-
-    def _load_script(self, script_path: t.Union[str, Path]):
-        if isinstance(script_path, str):
-            parsed_url = urlparse(script_path)
-            if parsed_url.netloc:
-                self.__script_files.append(script_path)
-                return
-            script_path = Path(script_path)
-
-        if script_path.exists() and script_path.is_file() and script_path.suffix == ".js":
-            self.__script_files.append(str(script_path))
         else:
-            raise ValueError(f"Script path '{script_path}' does not exist, is not a file, or is not a JavaScript file.")
+            if isinstance(script_paths, (str, Path)):
+                script_paths = [script_paths]
 
+            for script_path in script_paths:
+                load_script(script_path)
+
+            if not self.__script_files:
+                _warn("No JavaScript files found in the specified script paths.")
 
     @staticmethod
     def add_library(library: ElementLibrary) -> None:
@@ -510,7 +508,6 @@ class Gui:
                     from plotly.graph_objs import Figure as PlotlyFigure  # type: ignore[reportMissingImports]
 
                     if isinstance(content, PlotlyFigure):
-
                         def get_plotly_content(figure: PlotlyFigure):
                             return figure.to_html()
 
@@ -522,7 +519,6 @@ class Gui:
                     from matplotlib.figure import Figure as MatplotlibFigure
 
                     if isinstance(content, MatplotlibFigure):
-
                         def get_matplotlib_content(figure: MatplotlibFigure):
                             import base64
                             from io import BytesIO
@@ -836,12 +832,12 @@ class Gui:
         if var_name.startswith(_TaipyBase._HOLDER_PREFIX):
             for hp in _TaipyBase._get_holder_prefixes():
                 if var_name.startswith(hp):
-                    var_name = var_name[len(hp) :]
+                    var_name = var_name[len(hp):]
                     break
         suffix_var_name = ""
         if "." in var_name:
             first_dot_index = var_name.index(".")
-            suffix_var_name = var_name[first_dot_index + 1 :]
+            suffix_var_name = var_name[first_dot_index + 1:]
             var_name = var_name[:first_dot_index]
         var_name_decode, module_name = _variable_decode(self._get_expr_from_hash(var_name))
         current_context = self._get_locals_context()
@@ -1209,7 +1205,8 @@ class Gui:
             The transformed data or None if no transformation is possible.
         """
         try:
-            return Gui.__unsupported_data_converter(value) if _is_function(Gui.__unsupported_data_converter) else None  # type: ignore
+            return Gui.__unsupported_data_converter(value) if _is_function(
+                Gui.__unsupported_data_converter) else None  # type: ignore
         except Exception as e:
             _warn(f"Error transforming data: {str(e)}")
             return None
@@ -1239,7 +1236,8 @@ class Gui:
                                 break
                         except Exception as e:  # pragma: no cover
                             _warn(
-                                f"Exception raised in '{lib_name}.get_data({lib_name}, payload, {user_var_name}, value)'",  # noqa: E501
+                                f"Exception raised in '{lib_name}.get_data({lib_name}, payload, {user_var_name}, value)'",
+                                # noqa: E501
                                 e,
                             )
             if not isinstance(ret_payload, dict):
@@ -1313,9 +1311,9 @@ class Gui:
             k: v
             for k, v in vars(self._get_data_scope()).items()
             if not k.startswith("_")
-            and not callable(v)
-            and "TpExPr" not in k
-            and not isinstance(v, (ModuleType, FunctionType, LambdaType, type, Page))
+               and not callable(v)
+               and "TpExPr" not in k
+               and not isinstance(v, (ModuleType, FunctionType, LambdaType, type, Page))
         }
         function_data = {
             k: v
@@ -2062,7 +2060,8 @@ class Gui:
             raise Exception("name is required for add_page() function.")
         if not Gui.__RE_PAGE_NAME.match(name):  # pragma: no cover
             raise SyntaxError(
-                f'Page name "{name}" is invalid. It must only contain letters, digits, dash (-), underscore (_), and forward slash (/) characters.'  # noqa: E501
+                f'Page name "{name}" is invalid. It must only contain letters, digits, dash (-), underscore (_), and forward slash (/) characters.'
+                # noqa: E501
             )
         if name.startswith("/"):  # pragma: no cover
             raise SyntaxError(f'Page name "{name}" cannot start with forward slash (/) character.')
@@ -2260,7 +2259,8 @@ class Gui:
                 self._bind(encoded_var_name, bind_locals[var_name])
             else:
                 _warn(
-                    f"Variable '{var_name}' is not available in either the '{self._get_locals_context()}' or '__main__' modules."  # noqa: E501
+                    f"Variable '{var_name}' is not available in either the '{self._get_locals_context()}' or '__main__' modules."
+                    # noqa: E501
                 )
         return encoded_var_name
 
@@ -2629,7 +2629,8 @@ class Gui:
                 _warn(f"Using webapp_path: '{_conf_webapp_path}'.")
             else:  # pragma: no cover
                 _warn(
-                    f"webapp_path: '{_conf_webapp_path}' is not a valid directory. Falling back to '{_webapp_path}'."  # noqa: E501
+                    f"webapp_path: '{_conf_webapp_path}' is not a valid directory. Falling back to '{_webapp_path}'."
+                    # noqa: E501
                 )
         return _webapp_path
 
@@ -2701,7 +2702,8 @@ class Gui:
             if not util.find_spec("pyngrok"):
                 raise RuntimeError("Cannot use ngrok as pyngrok package is not installed.")
             ngrok.set_auth_token(token)  # type: ignore[reportPossiblyUnboundVariable]
-            self._ngrok = (ngrok.connect(app_config.get("port"), "http"), token)  # type: ignore[reportPossiblyUnboundVariable]
+            self._ngrok = (
+                ngrok.connect(app_config.get("port"), "http"), token)  # type: ignore[reportPossiblyUnboundVariable]
             _TaipyLogger._get_logger().info(f" * NGROK Public Url: {self._ngrok[0].public_url}")
 
     def __bind_default_function(self):
@@ -2766,11 +2768,8 @@ class Gui:
         if self.__css_file:
             styles.append(f"{self.__css_file}")
 
-        if self.__script_files is not None:
-            if len(self.__script_files) == 1:
-                scripts.append(self.__script_files[0])
-            else:
-                scripts.extend(self.__script_files)
+        if self.__script_files:
+            scripts.extend(self.__script_files)
 
         self._flask_blueprint.append(extension_bp)
 
@@ -2947,7 +2946,8 @@ class Gui:
                             glob_ctx[lib_context[0]] = lib_context[1]
                     elif lib_context:
                         _warn(
-                            f"Method {name}.on_init() should return a Tuple[str, Any] where the first element must be a valid Python identifier."  # noqa: E501
+                            f"Method {name}.on_init() should return a Tuple[str, Any] where the first element must be a valid Python identifier."
+                            # noqa: E501
                         )
                 except Exception as e:  # pragma: no cover
                     if not self._call_on_exception(f"{name}.on_init", e):
