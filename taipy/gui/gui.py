@@ -420,19 +420,6 @@ class Gui:
                 Gui.add_library(library)
 
     def __load_scripts(self, script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]]):
-        def load_script(path: t.Union[str, Path]):
-            if isinstance(path, str):
-                parsed_url = urlparse(path)
-                if parsed_url.netloc:
-                    self.__script_files.append(path)
-                    return
-                path = Path(path)
-
-            if isinstance(path, Path) and path.exists() and path.is_file() and path.suffix == ".js":
-                self.__script_files.append(str(path))
-            else:
-                _warn(f"Script path '{path}' does not exist, is not a file, or is not a JavaScript file.")
-
         if script_paths is None:
             return
         else:
@@ -440,7 +427,18 @@ class Gui:
                 script_paths = [script_paths]
 
             for script_path in script_paths:
-                load_script(script_path)
+                if isinstance(script_path, str):
+                    parsed_url = urlparse(script_path)
+                    if parsed_url.netloc:
+                        self.__script_files.append(script_path)
+                        continue
+                    script_path = Path(script_path)
+
+                if isinstance(script_path,
+                              Path) and script_path.exists() and script_path.is_file() and script_path.suffix == ".js":
+                    self.__script_files.append(str(script_path))
+                else:
+                    _warn(f"Script path '{script_path}' does not exist, is not a file, or is not a JavaScript file.")
 
             if not self.__script_files:
                 _warn("No JavaScript files found in the specified script paths.")
