@@ -98,6 +98,20 @@ class TestParquetDataNode:
         assert isinstance(dn_1, ParquetDataNode)
         assert dn_1.properties["exposed_type"] == MyCustomObject
 
+        parquet_dn_config_2 = Config.configure_parquet_data_node(
+            id="bar", default_path=path, compression=compression, exposed_type=np.ndarray
+        )
+        dn_2 = _DataManagerFactory._build_manager()._create_and_set(parquet_dn_config_2, None, None)
+        assert isinstance(dn_2, ParquetDataNode)
+        assert dn_2.properties["exposed_type"] == np.ndarray
+
+        parquet_dn_config_3 = Config.configure_parquet_data_node(
+            id="bar", default_path=path, compression=compression, exposed_type=pd.DataFrame
+        )
+        dn_3 = _DataManagerFactory._build_manager()._create_and_set(parquet_dn_config_3, None, None)
+        assert isinstance(dn_3, ParquetDataNode)
+        assert dn_3.properties["exposed_type"] == pd.DataFrame
+
         with pytest.raises(InvalidConfigurationId):
             dn = ParquetDataNode("foo bar", Scope.SCENARIO, properties={"path": path, "name": "super name"})
 

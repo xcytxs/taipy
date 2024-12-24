@@ -302,6 +302,100 @@ class TestExcelDataNode:
         data = dn.read()
         assert isinstance(data, pd.DataFrame)
 
+    def test_pandas_dataframe_exposed_type(self):
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo",
+            Scope.SCENARIO,
+            properties={"default_path": path, "exposed_type": pd.DataFrame, "sheet_name": "Sheet1"},
+        )
+        assert dn.properties["exposed_type"] == pd.DataFrame
+        data = dn.read()
+        assert isinstance(data, pd.DataFrame)
+
+    def test_pandas_dataframe_exposed_type_a(self):
+        import pandas
+
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo",
+            Scope.SCENARIO,
+            properties={"default_path": path, "exposed_type": pandas.DataFrame, "sheet_name": "Sheet1"},
+        )
+        assert dn.properties["exposed_type"] == pandas.DataFrame
+        data = dn.read()
+        assert isinstance(data, pandas.DataFrame)
+
+    def test_pandas_dataframe_exposed_type_b(self):
+        from pandas import DataFrame
+
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo",
+            Scope.SCENARIO,
+            properties={"default_path": path, "exposed_type": DataFrame, "sheet_name": "Sheet1"},
+        )
+        assert dn.properties["exposed_type"] == DataFrame
+        data = dn.read()
+        assert isinstance(data, DataFrame)
+
+    def test_pandas_dataframe_exposed_type_c(self):
+        from pandas import DataFrame as DF
+
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo",
+            Scope.SCENARIO,
+            properties={"default_path": path, "exposed_type": DF, "sheet_name": "Sheet1"},
+        )
+        assert dn.properties["exposed_type"] == DF
+        data = dn.read()
+        assert isinstance(data, DF)
+
+    def test_numpy_ndarray_exposed_type(self):
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo", Scope.SCENARIO, properties={"default_path": path, "exposed_type": np.ndarray, "sheet_name": "Sheet1"}
+        )
+        assert dn.properties["exposed_type"] == np.ndarray
+        data = dn.read()
+        assert isinstance(data, np.ndarray)
+
+    def test_numpy_ndarray_exposed_type_a(self):
+        import numpy
+
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo",
+            Scope.SCENARIO,
+            properties={"default_path": path, "exposed_type": numpy.ndarray, "sheet_name": "Sheet1"},
+        )
+        assert dn.properties["exposed_type"] == numpy.ndarray
+        data = dn.read()
+        assert isinstance(data, numpy.ndarray)
+
+    def test_numpy_ndarray_exposed_type_b(self):
+        from numpy import ndarray
+
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo", Scope.SCENARIO, properties={"default_path": path, "exposed_type": ndarray, "sheet_name": "Sheet1"}
+        )
+        assert dn.properties["exposed_type"] == ndarray
+        data = dn.read()
+        assert isinstance(data, ndarray)
+
+    def test_numpy_ndarray_exposed_type_c(self):
+        from numpy import ndarray as nd_array
+
+        path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example.xlsx")
+        dn = ExcelDataNode(
+            "foo", Scope.SCENARIO, properties={"default_path": path, "exposed_type": nd_array, "sheet_name": "Sheet1"}
+        )
+        assert dn.properties["exposed_type"] == nd_array
+        data = dn.read()
+        assert isinstance(data, nd_array)
+
     def test_complex_exposed_type_dict(self):
         # ["Sheet1", "Sheet2", "Sheet3", "Sheet4", "Sheet5"]
         path = os.path.join(pathlib.Path(__file__).parent.resolve(), "data_sample/example_4.xlsx")

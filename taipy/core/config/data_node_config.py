@@ -14,6 +14,9 @@ from copy import copy
 from datetime import timedelta
 from typing import Any, Callable, Dict, List, Optional, Union
 
+import numpy
+import pandas
+
 from taipy.common.config import Config
 from taipy.common.config._config import _Config
 from taipy.common.config.common._config_blocker import _ConfigBlocker
@@ -71,11 +74,15 @@ class DataNodeConfig(Section):
     _EXPOSED_TYPE_PANDAS = "pandas"
     _EXPOSED_TYPE_MODIN = "modin"  # Deprecated in favor of pandas since 3.1.0
     _EXPOSED_TYPE_NUMPY = "numpy"
+    _EXPOSED_TYPE_PANDAS_DATAFRAME = pandas.DataFrame
+    _EXPOSED_TYPE_NUMPY_NDARRAY = numpy.ndarray
     _DEFAULT_EXPOSED_TYPE = _EXPOSED_TYPE_PANDAS
 
     _ALL_EXPOSED_TYPES = [
         _EXPOSED_TYPE_PANDAS,
         _EXPOSED_TYPE_NUMPY,
+        _EXPOSED_TYPE_PANDAS_DATAFRAME,
+        _EXPOSED_TYPE_NUMPY_NDARRAY,
     ]
 
     _OPTIONAL_ENCODING_PROPERTY = "encoding"

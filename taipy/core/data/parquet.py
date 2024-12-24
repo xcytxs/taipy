@@ -227,9 +227,9 @@ class ParquetDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
         return self._do_read_from_path(path, properties[self._EXPOSED_TYPE_PROPERTY], kwargs)
 
     def _do_read_from_path(self, path: str, exposed_type: str, kwargs: Dict) -> Any:
-        if exposed_type == self._EXPOSED_TYPE_PANDAS:
+        if exposed_type in [self._EXPOSED_TYPE_PANDAS, self._EXPOSED_TYPE_PANDAS_DATAFRAME]:
             return self._read_as_pandas_dataframe(path, kwargs)
-        if exposed_type == self._EXPOSED_TYPE_NUMPY:
+        if exposed_type in [self._EXPOSED_TYPE_NUMPY, self._EXPOSED_TYPE_NUMPY_NDARRAY]:
             return self._read_as_numpy(path, kwargs)
         return self._read_as(path, kwargs)
 
@@ -249,4 +249,3 @@ class ParquetDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
 
     def _write(self, data: Any):
         self._write_with_kwargs(data)
-
