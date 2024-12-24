@@ -77,33 +77,29 @@ def handle_single_page_app():
         main_file.write("\n")
         main_file.write("    gui = Gui(page=page)\n")
 
+    with open(os.path.join(os.getcwd(), "sections", "import.txt"), "a") as import_file:
+        import_file.write("import taipy.gui.builder as tgb\n")
+
     handle_run_service()
 
     with open(os.path.join(os.getcwd(), "sections", "page_content.txt"), "a") as page_content_file:
         page_content_file.write(
-            '''
-page = """
-<center>
-<|navbar|lov={[("home", "Homepage")]}|>
-</center>
+            """
+with tgb.Page() as page:
+    tgb.navbar(lov="{[('home', 'Homepage')]}")
 
 """
-'''
         )
 
 
 def handle_multi_page_app(pages):
     for page_name in pages:
         os.mkdir(os.path.join(os.getcwd(), "pages", page_name))
-        with open(os.path.join(os.getcwd(), "pages", "page_example", "page_example.md"), "r") as page_md_file:
-            page_md_content = page_md_file.read()
-        page_md_content = page_md_content.replace("Page example", page_name.replace("_", " ").title())
-        with open(os.path.join(os.getcwd(), "pages", page_name, page_name + ".md"), "w") as page_md_file:
-            page_md_file.write(page_md_content)
 
         with open(os.path.join(os.getcwd(), "pages", "page_example", "page_example.py"), "r") as page_content_file:
             page_py_content = page_content_file.read()
         page_py_content = page_py_content.replace("page_example", page_name)
+        page_py_content = page_py_content.replace("Page example", page_name.replace("_", " ").title())
         with open(os.path.join(os.getcwd(), "pages", page_name, page_name + ".py"), "w") as page_content_file:
             page_content_file.write(page_py_content)
 

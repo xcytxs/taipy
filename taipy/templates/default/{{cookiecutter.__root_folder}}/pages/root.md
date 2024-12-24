@@ -1,3 +1,0 @@
-<center>
-<|navbar|>
-</center>
