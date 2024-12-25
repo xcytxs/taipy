@@ -241,7 +241,9 @@ class _DataNodeConfigChecker(_ConfigChecker):
         if not isinstance(data_node_config.exposed_type, str):
             return
         if data_node_config.exposed_type not in DataNodeConfig._ALL_EXPOSED_TYPES:
-            valid_exposed_types_str = ", ".join([f'"{x}"' for x in DataNodeConfig._ALL_EXPOSED_TYPES])
+            valid_exposed_types_str = ", ".join(
+                [f'"{x}"' for x in DataNodeConfig._ALL_EXPOSED_TYPES if isinstance(x, str)]
+            )
             self._error(
                 data_node_config._EXPOSED_TYPE_KEY,
                 data_node_config.exposed_type,
