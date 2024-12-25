@@ -145,7 +145,7 @@ def test_multipage_gui_template(tmpdir):
 
     assert sorted(os.listdir(os.path.join(tmpdir, "foo_app"))) == sorted(["requirements.txt", "main.py", "pages"])
     assert sorted(os.listdir(os.path.join(tmpdir, "foo_app", "pages"))) == sorted(
-        ["name_1", "name_2", "name_3", "root.md", "root.py", "__init__.py"]
+        ["name_1", "name_2", "name_3", "root.py", "__init__.py"]
     )
 
     taipy_path = os.getcwd()
