@@ -16,6 +16,7 @@ import logging
 import re
 import typing as t
 import warnings
+from pathlib import Path
 
 from ._warnings import TaipyGuiAlwaysWarning
 
@@ -34,6 +35,7 @@ class _Page(object):
         self._style: t.Optional[t.Union[str, t.Dict[str, t.Any]]] = None
         self._route: t.Optional[str] = None
         self._head: t.Optional[list] = None
+        self._script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]] = None
 
     def render(self, gui: Gui, silent: t.Optional[bool] = False):
         if self._renderer is None:

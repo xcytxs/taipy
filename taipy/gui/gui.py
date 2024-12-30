@@ -2074,6 +2074,7 @@ class Gui:
         new_page._route = name
         new_page._renderer = page
         new_page._style = style or page._get_style()
+        new_page._script_paths = page._get_script_paths()
         # Append page to _config
         self._config.pages.append(new_page)
         self._config.routes.append(name)
@@ -2558,7 +2559,7 @@ class Gui:
             with self._set_locals_context(context):
                 self._call_on_page_load(nav_page)
             return self._server._render(
-                page._rendered_jsx, page._style if page._style is not None else "", page._head, context
+                page._rendered_jsx, page._script_paths if page._script_paths is not None else [], page._style if page._style is not None else "", page._head, context #noqa: E501
             )
         else:
             return ("No page template", 404)
