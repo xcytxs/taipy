@@ -64,15 +64,13 @@ const setStyle = (id: string, styleString: string): void => {
 
 // set script tag for the page
 const setScript = (id: string, scriptPaths: string[]): void => {
+    document.querySelectorAll(`script[id^="${id}_"]`).forEach(script => script.remove());
     scriptPaths.forEach((path, index) => {
-        let script = document.getElementById(`${id}_${index}`) as HTMLScriptElement | null;
-        if (!script) {
-            script = document.createElement("script");
-            script.id = `${id}_${index}`;
-            script.src = path;
-            script.defer = true;
-            document.head.append(script);
-        }
+        const script = document.createElement("script");
+        script.id = `${id}_${index}`;
+        script.src = path;
+        script.defer = true;
+        document.head.append(script);
     });
 };
 
