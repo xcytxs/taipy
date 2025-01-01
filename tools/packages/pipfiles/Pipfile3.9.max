@@ -57,11 +57,11 @@ version = "==4.2.13"
 "pymongo" = {version="==4.10.1", extras=["srv"]}
 "sqlalchemy" = {version="==2.0.36"}
 "toml" = {version="==0.10.2"}
-"boto3" = {version="==1.35.71"}
+"boto3" = {version="==1.35.90"}
 "cookiecutter" = {version="==2.6.0"}
 "flask" = {version="==3.1.0"}
 "flask-cors" = {version="==5.0.0"}
-"flask-socketio" = {version="==5.4.1"}
+"flask-socketio" = {version="==5.5.0"}
 "markdown" = {version="==3.7"}
 "python-dotenv" = {version="==1.0.1"}
 "pytz" = {version="==2024.2"}
@@ -71,12 +71,12 @@ version = "==4.2.13"
 "kthread" = {version="==0.2.3"}
 "gitignore-parser" = {version="==0.1.11"}
 "simple-websocket" = {version="==1.1.0"}
-"twisted" = {version="==24.10.0"}
-"deepdiff" = {version="==8.0.1"}
+"twisted" = {version="==24.11.0"}
+"deepdiff" = {version="==8.1.1"}
 "flask-restful" = {version="==0.3.10"}
 "passlib" = {version="==1.7.4"}
-"marshmallow" = {version="==3.23.1"}
-"apispec" = {version="==6.7.1", extras=["yaml"]}
+"marshmallow" = {version="==3.23.2"}
+"apispec" = {version="==6.8.0", extras=["yaml"]}
 "apispec-webframeworks" = {version="==1.2.0"}
 "watchdog" = {version="==6.0.0"}
-"charset-normalizer" = {version="==3.4.0"}
+"charset-normalizer" = {version="==3.4.1"}
