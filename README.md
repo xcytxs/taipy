@@ -8,43 +8,43 @@
 </div>
 </br>
 <div align="center">
-    <img 
-        src="https://img.shields.io/github/license/Avaiga/taipy?style=plastic&color=ff371a&labelColor=1f1f1f" 
-        alt="GitHub License" 
-        height="20px" 
+    <img
+        src="https://img.shields.io/github/license/Avaiga/taipy?style=plastic&color=ff371a&labelColor=1f1f1f"
+        alt="GitHub License"
+        height="20px"
     />
     <a target="_blank" href="https://github.com/Avaiga/taipy/releases">
-        <img 
-            alt="GitHub Release" 
-            height="20px" 
+        <img
+            alt="GitHub Release"
+            height="20px"
             src="https://img.shields.io/github/v/release/Avaiga/taipy?display_name=release&style=plastic&color=ff371a&labelColor=1f1f1f"
         ></a>
 </div>
 <div align="center">
-   <img 
-      src="https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-ff371a?style=plastic&labelColor=1f1f1f" 
-        alt="Python version needed: 3.9" 
+   <img
+      src="https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-ff371a?style=plastic&labelColor=1f1f1f"
+        alt="Python version needed: 3.9"
     />
-  
+
 </div>
 <div align="center">
     <a target="_blank" href="https://docs.taipy.io/en/latest/">
-        <img 
-            src="https://img.shields.io/badge/docs-ff371a?style=plastic&labelColor=1f1f1f&label=Explore" 
-            height="20px" 
-            alt="Explore the docs" 
+        <img
+            src="https://img.shields.io/badge/docs-ff371a?style=plastic&labelColor=1f1f1f&label=Explore"
+            height="20px"
+            alt="Explore the docs"
         ></a>
        <a target="_blank" href="https://docs.taipy.io/en/latest/gallery/">
-        <img 
-            src="https://img.shields.io/badge/gallery-ff371a?style=plastic&labelColor=1f1f1f&label=Explore" 
-            height="20px" 
-            alt="Explore Gallery" 
+        <img
+            src="https://img.shields.io/badge/gallery-ff371a?style=plastic&labelColor=1f1f1f&label=Explore"
+            height="20px"
+            alt="Explore Gallery"
         ></a>
     <a target="_blank" href="https://discord.com/invite/SJyz2VJGxV">
-        <img 
-            src="https://img.shields.io/discord/1125797687476887563?style=plastic&labelColor=1f1f1f&logo=discord&logoColor=ff371a&label=Discord&color=ff371a" 
-            height="20px" 
-            alt="Discord support" 
+        <img
+            src="https://img.shields.io/discord/1125797687476887563?style=plastic&labelColor=1f1f1f&logo=discord&logoColor=ff371a&label=Discord&color=ff371a"
+            height="20px"
+            alt="Discord support"
         ></a>
 </div>
 <h1 align="center">
@@ -58,7 +58,7 @@ No more compromises on performance, customization, and scalability.
 
 <br />
 
-<div align="center"> 
+<div align="center">
      <strong> Go beyond existing libraries  </strong>
 </div>
 
@@ -179,7 +179,7 @@ The application filters a dataset of films based on the user's selected genre an
 Here is the full code for both the front end and back end of the application.
 
 <p align="center" width=80% >
-    
+
 ```python
 import taipy as tp
 import pandas as pd
@@ -262,7 +262,7 @@ Want to be part of the Taipy community? Check out our [**Code of Conduct**](http
 
 ## 🪪 License
 
-Copyright 2021-2024 Avaiga Private Limited
+Copyright 2021-2025 Avaiga Private Limited
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 the License. You may obtain a copy of the License at
