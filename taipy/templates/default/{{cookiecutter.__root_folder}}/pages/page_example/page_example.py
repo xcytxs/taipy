@@ -11,11 +11,12 @@
 
 """
 A page of the application.
-Page content is imported from the page_example.md file.
+Page content is built using the Page builder API.
 
-Please refer to https://docs.taipy.io/en/latest/manuals/userman/gui/pages for more details.
+Please refer to https://docs.taipy.io/en/latest/userman/gui/pages/builder/ for more details.
 """
 
-from taipy.gui import Markdown
+import taipy.gui.builder as tgb
 
-page_example = Markdown("pages/page_example/page_example.md")
+with tgb.Page() as page_example:
+    tgb.text("# Page example", mode="md")

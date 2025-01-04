@@ -9,7 +9,8 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-from taipy.gui import Markdown, notify
+import taipy.gui.builder as tgb
+from taipy.gui import notify
 
 from .data_node_management import manage_partial
 
@@ -27,4 +28,16 @@ def manage_data_node_partial(state):
     manage_partial(state)
 
 
-scenario_page = Markdown("pages/scenario_page/scenario_page.md")
+with tgb.Page() as scenario_page:
+    with tgb.layout(columns="1, 1"):
+        with tgb.part(render="{selected_scenario}"):
+            tgb.scenario(
+                "{selected_scenario}",
+                expandable=False,
+                expanded=True,
+                on_submission_change=notify_on_submission,
+            )
+
+            tgb.scenario_dag("{selected_scenario}")
+
+        tgb.part(partial="{data_node_partial}", render="{selected_data_node}")
