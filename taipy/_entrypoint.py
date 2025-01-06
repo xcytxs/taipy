@@ -14,7 +14,7 @@ import sys
 from importlib.util import find_spec
 
 from taipy.common._cli._base_cli._taipy_parser import _TaipyParser
-from taipy.common._cli._create_cli import _CreateCLI
+from taipy.common._cli._create_cli_factory import _CreateCLIFactory
 from taipy.common._cli._help_cli import _HelpCLI
 from taipy.common._cli._run_cli import _RunCLI
 from taipy.core._cli._core_cli_factory import _CoreCLIFactory
@@ -42,14 +42,15 @@ def _entrypoint():
         _enterprise_entrypoint_initialize()
 
     _core_cli = _CoreCLIFactory._build_cli()
+    _create_cli = _CreateCLIFactory._build_cli()
 
     _RunCLI.create_parser()
     _GuiCLI.create_run_parser()
     _core_cli.create_run_parser()
 
     _VersionCLIFactory._build_cli().create_parser()
-    _CreateCLI.generate_template_map()
-    _CreateCLI.create_parser()
+    _create_cli.generate_template_map()
+    _create_cli.create_parser()
     _MigrateCLI.create_parser()
     _HelpCLI.create_parser()
 
@@ -67,7 +68,7 @@ def _entrypoint():
     _HelpCLI.handle_command()
     _VersionCLIFactory._build_cli().handle_command()
     _MigrateCLI.handle_command()
-    _CreateCLI.handle_command()
+    _create_cli.handle_command()
 
     _TaipyParser._remove_argument("help")
     _TaipyParser._parser.print_help()
