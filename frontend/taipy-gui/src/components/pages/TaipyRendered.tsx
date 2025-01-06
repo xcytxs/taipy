@@ -129,8 +129,6 @@ const TaipyRendered = (props: TaipyRenderedProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [path, state.id, dispatch, partial, fromBlock, baseURL]);
 
-    console.log(head)
-
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             {head.length ? (
