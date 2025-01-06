@@ -129,22 +129,15 @@ const TaipyRendered = (props: TaipyRenderedProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [path, state.id, dispatch, partial, fromBlock, baseURL]);
 
+    console.log(head)
+
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-            {head.length ? head.map((v, i) => {
-                if (v.tag === "script") {
-                    const element = document.createElement(v.tag);
-                    Object.entries(v.props).forEach(([key, value]) => element.setAttribute(key, value));
-                    element.innerHTML = v.content;
-                    document.head.appendChild(element);
-                    return null;
-                }
-                return (
-                    <Helmet key={`head${i}`}>
-                        {React.createElement(v.tag, { ...v.props }, v.content)}
-                    </Helmet>
-                );
-            }) : null}
+            {head.length ? (
+                <Helmet>
+                    {head.map((v, i) => React.createElement(v.tag, { key: `head${i}`, ...v.props }, v.content))}
+                </Helmet>
+            ) : null}
             <PageContext.Provider value={pageState}>
                 <JsxParser
                     disableKeyGeneration={true}
