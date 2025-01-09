@@ -78,7 +78,7 @@ class Page:
         self._notebook_gui: t.Optional["Gui"] = None
         self._notebook_page: t.Optional["_Page"] = None
         self.set_style(kwargs.get("style", None))
-        self.script_paths(kwargs.get("script_paths", None))
+        self._script_paths(kwargs.get("script_paths", None))
 
     def create_page(self) -> t.Optional[Page]:
         """Create the page content for page modules.
@@ -185,7 +185,7 @@ class Page:
     def _get_style(self):
         return self.__style
 
-    def script_paths(self, script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]]) -> Page:
+    def _script_paths(self, script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]]) -> Page:
         """
         Load a script or a list of scripts to be used in the page.
 
