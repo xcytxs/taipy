@@ -40,8 +40,13 @@ class _Page(object):
             raise RuntimeError(f"Can't render page {self._route}: no renderer found")
         with warnings.catch_warnings(record=True) as w:
             warnings.resetwarnings()
-            with gui._set_locals_context(self._renderer._get_module_name()):
-                self._rendered_jsx = self._renderer.render(gui)
+            module_name = self._renderer._get_module_name()
+            with gui._set_locals_context(module_name):
+                render_return = self._renderer.render(gui)
+                if isinstance(render_return, tuple):
+                    self._rendered_jsx, module_name = render_return
+                else:
+                    self._rendered_jsx = render_return
             if silent:
                 s = ""
                 for wm in w:
@@ -76,4 +81,4 @@ class _Page(object):
         if hasattr(self._renderer, "head"):
             self._head = list(self._renderer.head)  # type: ignore
         # return renderer module_name from frame
-        return self._renderer._get_module_name()
+        return module_name
