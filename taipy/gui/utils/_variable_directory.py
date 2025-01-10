@@ -25,6 +25,8 @@ class _VariableDirectory:
         self._var_dir: t.Dict[str, t.Dict] = {}
         self._var_head: t.Dict[str, t.List[t.Tuple[str, str]]] = {}
         self._imported_var_dir: t.Dict[str, t.List[t.Tuple[str, str, str]]] = {}
+        self._pre_processed_module: t.Set[str] = set()
+        self._processed_module: t.Set[str] = set()
 
     def set_default(self, frame: FrameType) -> None:
         self._default_module = _get_module_name_from_frame(frame)
@@ -39,7 +41,10 @@ class _VariableDirectory:
             self._imported_var_dir[t.cast(str, module_name)] = imported_var_list
 
     def pre_process_module_import_all(self) -> None:
-        for imported_dir in self._imported_var_dir.values():
+        for base_module, imported_dir in self._imported_var_dir.items():
+            # Skip pre process for modules that have been processed
+            if base_module in self._pre_processed_module:
+                continue
             additional_var_list: t.List[t.Tuple[str, str, str]] = []
             for name, asname, module in imported_dir:
                 if name != "*" or asname != "*":
@@ -51,21 +56,28 @@ class _VariableDirectory:
                         (v, v, module) for v in self._locals_context.get_locals().keys() if not v.startswith("_")
                     )
             imported_dir.extend(additional_var_list)
+            # Save the pre-processed module
+            self._pre_processed_module.add(base_module)
 
     def process_imported_var(self) -> None:
         self.pre_process_module_import_all()
-        default_imported_dir = self._imported_var_dir[t.cast(str, self._default_module)]
-        with self._locals_context.set_locals_context(self._default_module):
-            for name, asname, module in default_imported_dir:
-                if name == "*" and asname == "*":
-                    continue
-                imported_module_name = _get_module_name_from_imported_var(
-                    name, self._locals_context.get_locals().get(asname, None), module
-                )
-                temp_var_name = self.add_var(asname, self._default_module)
-                self.add_var(name, imported_module_name, temp_var_name)
+        default_module = t.cast(str, self._default_module)
+        if default_module not in self._processed_module:
+            default_imported_dir = self._imported_var_dir[default_module]
+            with self._locals_context.set_locals_context(self._default_module):
+                for name, asname, module in default_imported_dir:
+                    if name == "*" and asname == "*":
+                        continue
+                    imported_module_name = _get_module_name_from_imported_var(
+                        name, self._locals_context.get_locals().get(asname, None), module
+                    )
+                    temp_var_name = self.add_var(asname, self._default_module)
+                    self.add_var(name, imported_module_name, temp_var_name)
+            self._processed_module.add(default_module)
 
         for k, v in self._imported_var_dir.items():
+            if k in self._processed_module:
+                continue
             with self._locals_context.set_locals_context(k):
                 for name, asname, module in v:
                     if name == "*" and asname == "*":
@@ -82,6 +94,7 @@ class _VariableDirectory:
                         self.add_var(asname, k, var_name)
                     else:
                         self.add_var(name, imported_module_name, var_asname)
+            self._processed_module.add(k)
 
     def add_var(self, name: str, module: t.Optional[str], var_name: t.Optional[str] = None) -> str:
         if module is None:
@@ -119,8 +132,10 @@ _MODULE_NAME_MAP: t.List[str] = []
 _MODULE_ID = "_TPMDL_"
 _RE_TPMDL_DECODE = re.compile(r"(.*?)" + _MODULE_ID + r"(\d+)$")
 
+
 def _is_moduled_variable(var_name: str):
     return _MODULE_ID in var_name
+
 
 def _variable_encode(var_name: str, module_name: t.Optional[str]):
     if module_name is None:

@@ -9,23 +9,21 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-import taipy.gui.builder as tgb
+from taipy.gui import Markdown
 
-selected_scenario = None
-selected_data_node = None
-content = ""
+b = 20
 
 
-with tgb.Page() as root:
-    with tgb.layout(columns="1, 5"):
-        with tgb.part(class_name="sidebar"):
-            tgb.scenario_selector("{selected_scenario}")
+def get_b(state):
+    return state.b
 
-            with tgb.part(render="{selected_scenario}"):
-                tgb.data_node_selector("{selected_data_node}", display_cycles=False)
 
-        with tgb.part(class_name="main"):
-            tgb.navbar()
+def set_b(state, val):
+    state.b = val
 
-            with tgb.part(class_name="main"):
-                tgb.text("{content}")
+
+md_page2 = Markdown(
+    """
+<|{b}|>
+"""
+)
