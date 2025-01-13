@@ -60,7 +60,7 @@ const chartValue = {
     },
 };
 const chartConfig = JSON.stringify({
-    columns: { Day_str: { dfid: "Day" }, "Daily hospital occupancy": { dfid: "Daily hospital occupancy" } },
+    columns: [{ Day_str: { dfid: "Day" }, "Daily hospital occupancy": { dfid: "Daily hospital occupancy" } }],
     traces: [["Day_str", "Daily hospital occupancy"]],
     xaxis: ["x"],
     yaxis: ["y"],
@@ -86,7 +86,7 @@ const mapValue = {
     },
 };
 const mapConfig = JSON.stringify({
-    columns: { Lat: { dfid: "Lat" }, Lon: { dfid: "Lon" } },
+    columns: [{ Lat: { dfid: "Lat" }, Lon: { dfid: "Lon" } }],
     traces: [["Lat", "Lon"]],
     xaxis: ["x"],
     yaxis: ["y"],
@@ -173,7 +173,7 @@ describe("Chart Component", () => {
             payload: { id: "chart", names: ["varName"], refresh: false },
             type: "REQUEST_UPDATE",
         });
-        expect(dispatch).toHaveBeenCalledWith({
+        await waitFor(() => expect(dispatch).toHaveBeenCalledWith({
             name: "data_var",
             payload: {
                 alldata: true,
@@ -183,7 +183,7 @@ describe("Chart Component", () => {
                 id: "chart",
             },
             type: "REQUEST_DATA_UPDATE",
-        });
+        }));
     });
     it("dispatch a well formed message on selection", async () => {
         const dispatch = jest.fn();

@@ -112,7 +112,7 @@ def __get_col_from_indexed(col_name: str, idx: int) -> t.Optional[str]:
     return col_name
 
 
-def _build_chart_config(gui: "Gui", attributes: t.Dict[str, t.Any], col_types: t.Dict[str, str]):  # noqa: C901
+def _build_chart_config(gui: "Gui", attributes: t.Dict[str, t.Any], col_types_list: t.List[t.Dict[str, str]]):  # noqa: C901
     if "data" not in attributes and "figure" in attributes:
         return {"traces": []}
     default_type = attributes.get("_default_type", "scatter")
@@ -167,32 +167,47 @@ def _build_chart_config(gui: "Gui", attributes: t.Dict[str, t.Any], col_types: t
         # axis names
         axis.append(__CHART_AXIS.get(trace[_Chart_iprops.type.value] or "", __CHART_DEFAULT_AXIS))
 
+    idx = 1
+    while f"data[{idx}]" in attributes:
+        if idx >= len(traces):
+            traces.append(list(traces[0]))
+            axis.append(__CHART_AXIS.get(traces[0][_Chart_iprops.type.value] or "", __CHART_DEFAULT_AXIS))
+        idx += 1
+
     # list of data columns name indexes with label text
     dt_idx = tuple(e.value for e in (axis[0] + (_Chart_iprops.label, _Chart_iprops.text)))
 
     # configure columns
-    columns: t.Set[str] = set()
-    for j, trace in enumerate(traces):
+    columns: t.List[t.Set[str]] = [set()] * len(traces)
+    for idx, trace in enumerate(traces):
         dt_idx = tuple(
-            e.value for e in (axis[j] if j < len(axis) else axis[0]) + (_Chart_iprops.label, _Chart_iprops.text)
+            e.value for e in (axis[idx] if idx < len(axis) else axis[0]) + (_Chart_iprops.label, _Chart_iprops.text)
         )
-        columns.update([trace[i] or "" for i in dt_idx if trace[i]])
+        columns[idx].update([trace[i] or "" for i in dt_idx if trace[i]])
     # add optional column if any
     markers = [
         t[_Chart_iprops.marker.value]
         or ({"color": t[_Chart_iprops.color.value]} if t[_Chart_iprops.color.value] else None)
         for t in traces
     ]
-    opt_cols = set()
-    for m in markers:
+    opt_cols: t.List[t.Set[str]] = [set()] * len(traces)
+    for idx, m in enumerate(markers):
         if isinstance(m, (dict, _MapDict)):
             for prop1 in __CHART_MARKER_TO_COLS:
                 val = m.get(prop1)
-                if isinstance(val, str) and val not in columns:
-                    opt_cols.add(val)
+                if isinstance(val, str) and val not in columns[idx]:
+                    opt_cols[idx].add(val)
 
     # Validate the column names
-    col_dict = _get_columns_dict(attributes.get("data"), list(columns), col_types, opt_columns=opt_cols)
+    col_dicts = []
+    for idx, col_types in enumerate(col_types_list):
+        if add_col_dict := _get_columns_dict(
+            attributes.get("data" if idx == 0 else f"data[{idx}]"),
+            list(columns[idx] if idx < len(columns) else columns[0]),
+            col_types,
+            opt_columns=opt_cols[idx] if idx < len(opt_cols) else opt_cols[0],
+        ):
+            col_dicts.append(add_col_dict)
 
     # Manage Decimator
     decimators: t.List[t.Optional[str]] = []
@@ -208,7 +223,14 @@ def _build_chart_config(gui: "Gui", attributes: t.Dict[str, t.Any], col_types: t
 
     # set default columns if not defined
     icols = [
-        [c2 for c2 in [__get_col_from_indexed(c1, i) for c1 in t.cast(dict, col_dict).keys()] if c2]
+        [
+            c2
+            for c2 in [
+                __get_col_from_indexed(c1, i)
+                for c1 in t.cast(dict, col_dicts[i] if i < len(col_dicts) else col_dicts[0]).keys()
+            ]
+            if c2
+        ]
         for i in range(len(traces))
     ]
 
@@ -222,21 +244,24 @@ def _build_chart_config(gui: "Gui", attributes: t.Dict[str, t.Any], col_types: t
                     for j, v in enumerate(tr)
                 ]
 
-    if col_dict is not None:
-        reverse_cols = {str(cd.get("dfid")): c for c, cd in col_dict.items()}
+    if col_dicts:
+        reverse_cols = [{str(cd.get("dfid")): c for c, cd in col_dict.items()} for col_dict in col_dicts]
+        for idx in range(len(traces)):
+            if idx < len(reverse_cols):
+                reverse_cols.append(reverse_cols[0])
 
         # List used axis
         used_axis = [[e for e in (axis[j] if j < len(axis) else axis[0]) if tr[e.value]] for j, tr in enumerate(traces)]
 
         ret_dict = {
-            "columns": col_dict,
+            "columns": col_dicts,
             "labels": [
-                reverse_cols.get(tr[_Chart_iprops.label.value] or "", (tr[_Chart_iprops.label.value] or ""))
-                for tr in traces
+                reverse_cols[idx].get(tr[_Chart_iprops.label.value] or "", (tr[_Chart_iprops.label.value] or ""))
+                for idx, tr in enumerate(traces)
             ],
             "texts": [
-                reverse_cols.get(tr[_Chart_iprops.text.value] or "", (tr[_Chart_iprops.text.value] or None))
-                for tr in traces
+                reverse_cols[idx].get(tr[_Chart_iprops.text.value] or "", (tr[_Chart_iprops.text.value] or None))
+                for idx, tr in enumerate(traces)
             ],
             "modes": [tr[_Chart_iprops.mode.value] for tr in traces],
             "types": [tr[_Chart_iprops.type.value] for tr in traces],
@@ -253,8 +278,8 @@ def _build_chart_config(gui: "Gui", attributes: t.Dict[str, t.Any], col_types: t
                 for tr in traces
             ],
             "traces": [
-                [reverse_cols.get(c or "", c) for c in [tr[e.value] for e in used_axis[j]]]
-                for j, tr in enumerate(traces)
+                [reverse_cols[idx].get(c or "", c) for c in [tr[e.value] for e in used_axis[idx]]]
+                for idx, tr in enumerate(traces)
             ],
             "orientations": [tr[_Chart_iprops.orientation.value] for tr in traces],
             "names": [tr[_Chart_iprops._name.value] for tr in traces],

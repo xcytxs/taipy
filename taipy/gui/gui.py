@@ -1903,11 +1903,18 @@ class Gui:
                 rebuild = rebuild_val if rebuild_val is not None else rebuild
                 if rebuild:
                     attributes, hashes = self.__get_attributes(attr_json, hash_json, kwargs)
-                    data_hash = hashes.get("data", "")
+                    idx = 0
+                    data_hashes = []
+                    while data_hash := hashes.get("data" if idx == 0 else f"data[{idx}]", ""):
+                        data_hashes.append(data_hash)
+                        idx += 1
                     config = _build_chart_config(
                         self,
                         attributes,
-                        self._get_accessor().get_col_types(data_hash, _TaipyData(kwargs.get(data_hash), data_hash)),
+                        [
+                            self._get_accessor().get_col_types(data_hash, _TaipyData(kwargs.get(data_hash), data_hash))
+                            for data_hash in data_hashes
+                        ],
                     )
 
                     return json.dumps(config, cls=_TaipyJsonEncoder)

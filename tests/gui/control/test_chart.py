@@ -218,3 +218,15 @@ def test_chart_indexed_properties_with_arrays(gui: Gui, helpers):
         "&quot;lines&quot;: [null, &#x7B;&quot;dash&quot;: &quot;dashdot&quot;&#x7D;, &#x7B;&quot;dash&quot;: &quot;dash&quot;&#x7D;, null, &#x7B;&quot;dash&quot;: &quot;dashdot&quot;&#x7D;, &#x7B;&quot;dash&quot;: &quot;dash&quot;&#x7D;]",  # noqa: E501
     ]
     helpers.test_control_md(gui, md, expected_list)
+
+def test_chart_multi_data(gui: Gui, helpers, csvdata):
+    md_string = "<|{csvdata}|chart|x=Day|y=Daily hospital occupancy|data[1]={csvdata}|>"
+    expected_list = [
+        "<Chart",
+        'updateVarName="_TpD_tpec_TpExPr_csvdata_TPMDL_0"',
+        'dataVarNames="_TpD_tpec_TpExPr_csvdata_TPMDL_0"',
+        "data={_TpD_tpec_TpExPr_csvdata_TPMDL_0}",
+        "data1={_TpD_tpec_TpExPr_csvdata_TPMDL_0}",
+    ]
+    gui._set_frame(inspect.currentframe())
+    helpers.test_control_md(gui, md_string, expected_list)

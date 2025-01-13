@@ -60,6 +60,7 @@ interface ChartProp extends TaipyActiveProps, TaipyChangeProps {
     defaultConfig: string;
     config?: string;
     data?: Record<string, TraceValueType>;
+    //data${number}?: Record<string, TraceValueType>;
     defaultLayout?: string;
     layout?: string;
     plotConfig?: string;
@@ -69,13 +70,14 @@ interface ChartProp extends TaipyActiveProps, TaipyChangeProps {
     template?: string;
     template_Dark_?: string;
     template_Light_?: string;
-    //[key: `selected_${number}`]: number[];
+    //[key: `selected${number}`]: number[];
     figure?: Array<Record<string, unknown>>;
     onClick?: string;
+    dataVarNames?: string;
 }
 
 interface ChartConfig {
-    columns: Record<string, ColumnDesc>;
+    columns: Array<Record<string, ColumnDesc>>;
     labels: string[];
     modes: string[];
     types: string[];
@@ -217,7 +219,7 @@ export const getPlotIndex = (pt: PlotDatum) =>
         : pt.pointIndex;
 
 const defaultConfig = {
-    columns: {} as Record<string, ColumnDesc>,
+    columns: [] as Array<Record<string, ColumnDesc>>,
     labels: [],
     modes: [],
     types: [],
@@ -285,6 +287,15 @@ const getDataKey = (columns?: Record<string, ColumnDesc>, decimators?: string[])
     return [backCols, backCols.join("-") + (decimators ? `--${decimators.join("")}` : "")];
 };
 
+const isDataRefresh = (data?: Record<string, TraceValueType>) => data?.__taipy_refresh !== undefined;
+const getDataVarName = (updateVarName: string | undefined, dataVarNames: string[], idx: number) =>
+    idx === 0 ? updateVarName : dataVarNames[idx - 1];
+const getData = (
+    data: Record<string, TraceValueType>,
+    additionalDatas: Array<Record<string, TraceValueType>>,
+    idx: number
+) => (idx === 0 ? data : (idx <= additionalDatas.length ? additionalDatas[idx - 1]: undefined));
+
 const Chart = (props: ChartProp) => {
     const {
         title = "",
@@ -301,17 +312,35 @@ const Chart = (props: ChartProp) => {
     const dispatch = useDispatch();
     const [selected, setSelected] = useState<number[][]>([]);
     const plotRef = useRef<HTMLDivElement>(null);
-    const [dataKey, setDataKey] = useState("__default__");
+    const [dataKeys, setDataKeys] = useState<string[]>([]);
     const lastDataPl = useRef<Data[]>([]);
     const theme = useTheme();
     const module = useModule();
 
-    const refresh = useMemo(() => (data?.__taipy_refresh !== undefined ? nanoid() : false), [data]);
     const className = useClassNames(props.libClassName, props.dynamicClassName, props.className);
     const active = useDynamicProperty(props.active, props.defaultActive, true);
     const render = useDynamicProperty(props.render, props.defaultRender, true);
     const hover = useDynamicProperty(props.hoverText, props.defaultHoverText, undefined);
     const baseLayout = useDynamicJsonProperty(props.layout, props.defaultLayout || "", emptyLayout);
+
+    const dataVarNames = useMemo(() => (props.dataVarNames ? props.dataVarNames.split(";") : []), [props.dataVarNames]);
+    const oldAdditionalDatas = useRef<Array<Record<string, TraceValueType>>>([]);
+    const additionalDatas = useMemo(() => {
+        const newAdditionalDatas = dataVarNames.map(
+            (_, idx) => (props as unknown as Record<string, Record<string, TraceValueType>>)[`data${idx + 1}`]
+        );
+        if (newAdditionalDatas.length !== oldAdditionalDatas.current.length) {
+            oldAdditionalDatas.current = newAdditionalDatas;
+        } else if (!newAdditionalDatas.every((d, idx) => d === oldAdditionalDatas.current[idx])) {
+            oldAdditionalDatas.current = newAdditionalDatas;
+        }
+        return oldAdditionalDatas.current;
+    }, [dataVarNames, props]);
+
+    const refresh = useMemo(
+        () => (isDataRefresh(data) || additionalDatas.some((d) => isDataRefresh(d)) ? nanoid() : false),
+        [data, additionalDatas]
+    );
 
     // get props.selected[i] values
     useEffect(() => {
@@ -353,30 +382,53 @@ const Chart = (props: ChartProp) => {
     const config = useDynamicJsonProperty(props.config, props.defaultConfig, defaultConfig);
 
     useEffect(() => {
-        if (updateVarName) {
-            const [backCols, dtKey] = getDataKey(config.columns, config.decimators);
-            setDataKey(dtKey);
-            if (refresh || !data[dtKey]) {
-                dispatch(
-                    createRequestChartUpdateAction(
-                        updateVarName,
-                        id,
-                        module,
-                        backCols,
-                        dtKey,
-                        getDecimatorsPayload(
-                            config.decimators,
-                            plotRef.current,
-                            config.modes,
-                            config.columns,
-                            config.traces
-                        )
-                    )
-                );
-            }
-        }
+        setDataKeys((oldDtKeys) => {
+            let changed = false;
+            const newDtKeys = (config.columns || []).map((columns, idx) => {
+                const varName = getDataVarName(updateVarName, dataVarNames, idx);
+                if (varName) {
+                    const [backCols, dtKey] = getDataKey(columns, config.decimators);
+                    changed = changed || idx > oldDtKeys.length || oldDtKeys[idx] !== dtKey;
+                    const lData = getData(data, additionalDatas, idx);
+                    if (lData === undefined || isDataRefresh(lData) || !lData[dtKey]) {
+                        Promise.resolve().then(() =>
+                            dispatch(
+                                createRequestChartUpdateAction(
+                                    varName,
+                                    id,
+                                    module,
+                                    backCols,
+                                    dtKey,
+                                    getDecimatorsPayload(
+                                        config.decimators,
+                                        plotRef.current,
+                                        config.modes,
+                                        columns,
+                                        config.traces
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    return dtKey;
+                }
+                return "";
+            });
+            return changed ? newDtKeys : oldDtKeys;
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [refresh, dispatch, config.columns, config.traces, config.modes, config.decimators, updateVarName, id, module]);
+    }, [
+        refresh,
+        dispatch,
+        config.columns,
+        config.traces,
+        config.modes,
+        config.decimators,
+        updateVarName,
+        dataVarNames,
+        id,
+        module,
+    ]);
 
     useDispatchRequestUpdateOnFirstRender(dispatch, id, module, updateVars);
 
@@ -411,14 +463,14 @@ const Chart = (props: ChartProp) => {
             xaxis: {
                 title:
                     config.traces.length && config.traces[0].length && config.traces[0][0]
-                        ? getColNameFromIndexed(config.columns[config.traces[0][0]]?.dfid)
+                        ? getColNameFromIndexed(config.columns[0][config.traces[0][0]]?.dfid)
                         : undefined,
                 ...layout.xaxis,
             },
             yaxis: {
                 title:
-                    config.traces.length == 1 && config.traces[0].length > 1 && config.columns[config.traces[0][1]]
-                        ? getColNameFromIndexed(config.columns[config.traces[0][1]]?.dfid)
+                    config.traces.length == 1 && config.traces[0].length > 1 && config.columns[0][config.traces[0][1]]
+                        ? getColNameFromIndexed(config.columns[0][config.traces[0][1]]?.dfid)
                         : undefined,
                 ...layout.yaxis,
             },
@@ -447,98 +499,112 @@ const Chart = (props: ChartProp) => {
 
     const dataPl = useMemo(() => {
         if (props.figure) {
-            return lastDataPl.current;
-        }
-        if (data.__taipy_refresh !== undefined) {
             return lastDataPl.current || [];
         }
-        const dtKey = getDataKey(config.columns, config.decimators)[1];
-        if (!dataKey.startsWith(dtKey)) {
+        const dataList = dataKeys.map((_, idx) => getData(data, additionalDatas, idx));
+        if (!dataList.length || dataList.every((d) => !d || isDataRefresh(d) || !Object.keys(d).length)) {
             return lastDataPl.current || [];
         }
-        const datum = data[dataKey];
-        lastDataPl.current = datum
-            ? config.traces.map((trace, idx) => {
-                  const ret = {
-                      ...getArrayValue(config.options, idx, {}),
-                      type: config.types[idx],
-                      mode: config.modes[idx],
-                      name:
-                          getArrayValue(config.names, idx) ||
-                          (config.columns[trace[1]] ? getColNameFromIndexed(config.columns[trace[1]].dfid) : undefined),
-                  } as Record<string, unknown>;
-                  ret.marker = { ...getArrayValue(config.markers, idx, ret.marker || {}) };
-                  if (Object.keys(ret.marker as object).length) {
-                      MARKER_TO_COL.forEach((prop) => {
-                          const val = (ret.marker as Record<string, unknown>)[prop];
-                          if (typeof val === "string") {
-                              const arr = getValueFromCol(datum, val as string);
-                              if (arr.length) {
-                                  (ret.marker as Record<string, unknown>)[prop] = arr;
-                              }
-                          }
-                      });
-                  } else {
-                      delete ret.marker;
-                  }
-                  const xs = getValue(datum, trace, 0) || [];
-                  const ys = getValue(datum, trace, 1) || [];
-                  const addIndex = getArrayValue(config.addIndex, idx, true) && !ys.length;
-                  const baseX = addIndex ? Array.from(Array(xs.length).keys()) : xs;
-                  const baseY = addIndex ? xs : ys;
-                  const axisNames = config.axisNames.length > idx ? config.axisNames[idx] : ([] as string[]);
-                  if (baseX.length) {
-                      if (axisNames.length > 0) {
-                          ret[axisNames[0]] = baseX;
-                      } else {
-                          ret.x = baseX;
-                      }
-                  }
-                  if (baseY.length) {
-                      if (axisNames.length > 1) {
-                          ret[axisNames[1]] = baseY;
-                      } else {
-                          ret.y = baseY;
-                      }
-                  }
-                  const baseZ = getValue(datum, trace, 2, true);
-                  if (baseZ) {
-                      if (axisNames.length > 2) {
-                          ret[axisNames[2]] = baseZ;
-                      } else {
-                          ret.z = baseZ;
-                      }
-                  }
-                  // Hack for treemap charts: create a fallback 'parents' column if needed
-                  // This works ONLY because 'parents' is the third named axis
-                  // (see __CHART_AXIS in gui/utils/chart_config_builder.py)
-                  else if (config.types[idx] === "treemap" && Array.isArray(ret.labels)) {
-                      ret.parents = Array(ret.labels.length).fill("");
-                  }
-                  // Other axis
-                  for (let i = 3; i < axisNames.length; i++) {
-                      ret[axisNames[i]] = getValue(datum, trace, i, true);
-                  }
-                  ret.text = getValue(datum, config.texts, idx, true);
-                  ret.xaxis = config.xaxis[idx];
-                  ret.yaxis = config.yaxis[idx];
-                  ret.hovertext = getValue(datum, config.labels, idx, true);
-                  const selPoints = getArrayValue(selected, idx, []);
-                  if (selPoints?.length) {
-                      ret.selectedpoints = selPoints;
-                  }
-                  ret.orientation = getArrayValue(config.orientations, idx);
-                  ret.line = getArrayValue(config.lines, idx);
-                  ret.textposition = getArrayValue(config.textAnchors, idx);
-                  const selectedMarker = getArrayValue(config.selectedMarkers, idx);
-                  if (selectedMarker) {
-                      ret.selected = { marker: selectedMarker };
-                  }
-                  return ret as Data;
-              })
-            : lastDataPl.current || [];
+        let changed = false;
+        const newDataPl = config.traces.map((trace, idx) => {
+            const currentData = idx < lastDataPl.current.length ? lastDataPl.current[idx] : {};
+            const dataKey = idx < dataKeys.length ? dataKeys[idx] : dataKeys[0];
+            const lData = idx < dataList.length ? dataList[idx] : dataList[0];
+            if (!lData || isDataRefresh(lData) || !Object.keys(lData).length) {
+                return currentData;
+            }
+            const dtKey = getDataKey(
+                idx < config.columns?.length ? config.columns[idx] : undefined,
+                config.decimators
+            )[1];
+            if (!dataKey.startsWith(dtKey) || !dtKey.length) {
+                return currentData;
+            }
+            changed = true;
+            const datum = lData[dataKey];
+            const columns = config.columns[idx];
+            const ret = {
+                ...getArrayValue(config.options, idx, {}),
+                type: config.types[idx],
+                mode: config.modes[idx],
+                name:
+                    getArrayValue(config.names, idx) ||
+                    (columns[trace[1]] ? getColNameFromIndexed(columns[trace[1]].dfid) : undefined),
+            } as Record<string, unknown>;
+            ret.marker = { ...getArrayValue(config.markers, idx, ret.marker || {}) };
+            if (Object.keys(ret.marker as object).length) {
+                MARKER_TO_COL.forEach((prop) => {
+                    const val = (ret.marker as Record<string, unknown>)[prop];
+                    if (typeof val === "string") {
+                        const arr = getValueFromCol(datum, val as string);
+                        if (arr.length) {
+                            (ret.marker as Record<string, unknown>)[prop] = arr;
+                        }
+                    }
+                });
+            } else {
+                delete ret.marker;
+            }
+            const xs = getValue(datum, trace, 0) || [];
+            const ys = getValue(datum, trace, 1) || [];
+            const addIndex = getArrayValue(config.addIndex, idx, true) && !ys.length;
+            const baseX = addIndex ? Array.from(Array(xs.length).keys()) : xs;
+            const baseY = addIndex ? xs : ys;
+            const axisNames = config.axisNames.length > idx ? config.axisNames[idx] : ([] as string[]);
+            if (baseX.length) {
+                if (axisNames.length > 0) {
+                    ret[axisNames[0]] = baseX;
+                } else {
+                    ret.x = baseX;
+                }
+            }
+            if (baseY.length) {
+                if (axisNames.length > 1) {
+                    ret[axisNames[1]] = baseY;
+                } else {
+                    ret.y = baseY;
+                }
+            }
+            const baseZ = getValue(datum, trace, 2, true);
+            if (baseZ) {
+                if (axisNames.length > 2) {
+                    ret[axisNames[2]] = baseZ;
+                } else {
+                    ret.z = baseZ;
+                }
+            }
+            // Hack for treemap charts: create a fallback 'parents' column if needed
+            // This works ONLY because 'parents' is the third named axis
+            // (see __CHART_AXIS in gui/utils/chart_config_builder.py)
+            else if (config.types[idx] === "treemap" && Array.isArray(ret.labels)) {
+                ret.parents = Array(ret.labels.length).fill("");
+            }
+            // Other axis
+            for (let i = 3; i < axisNames.length; i++) {
+                ret[axisNames[i]] = getValue(datum, trace, i, true);
+            }
+            ret.text = getValue(datum, config.texts, idx, true);
+            ret.xaxis = config.xaxis[idx];
+            ret.yaxis = config.yaxis[idx];
+            ret.hovertext = getValue(datum, config.labels, idx, true);
+            const selPoints = getArrayValue(selected, idx, []);
+            if (selPoints?.length) {
+                ret.selectedpoints = selPoints;
+            }
+            ret.orientation = getArrayValue(config.orientations, idx);
+            ret.line = getArrayValue(config.lines, idx);
+            ret.textposition = getArrayValue(config.textAnchors, idx);
+            const selectedMarker = getArrayValue(config.selectedMarkers, idx);
+            if (selectedMarker) {
+                ret.selected = { marker: selectedMarker };
+            }
+            return ret as Data;
+        });
+        if (changed) {
+            lastDataPl.current = newDataPl;
+        }
         return lastDataPl.current;
-    }, [props.figure, selected, data, config, dataKey]);
+    }, [props.figure, selected, data, additionalDatas, config, dataKeys]);
 
     const plotConfig = useMemo(() => {
         let plConf: Partial<Config> = {};
@@ -567,28 +633,41 @@ const Chart = (props: ChartProp) => {
         (eventData: PlotRelayoutEvent) => {
             onRangeChange && dispatch(createSendActionNameAction(id, module, { action: onRangeChange, ...eventData }));
             if (config.decimators && !config.types.includes("scatter3d")) {
-                const [backCols, dtKeyBase] = getDataKey(config.columns, config.decimators);
+                const [backCols, dtKeyBase] = getDataKey(
+                    config.columns?.length ? config.columns[0] : undefined,
+                    config.decimators
+                );
                 const dtKey = `${dtKeyBase}--${Object.entries(eventData)
                     .map(([k, v]) => `${k}=${v}`)
                     .join("-")}`;
-                setDataKey(dtKey);
-                dispatch(
-                    createRequestChartUpdateAction(
-                        updateVarName,
-                        id,
-                        module,
-                        backCols,
-                        dtKey,
-                        getDecimatorsPayload(
-                            config.decimators,
-                            plotRef.current,
-                            config.modes,
-                            config.columns,
-                            config.traces,
-                            eventData
-                        )
-                    )
-                );
+                setDataKeys((oldDataKeys) => {
+                    if (oldDataKeys.length === 0) {
+                        return [dtKey];
+                    }
+                    if (oldDataKeys[0] !== dtKey) {
+                        Promise.resolve().then(() =>
+                            dispatch(
+                                createRequestChartUpdateAction(
+                                    updateVarName,
+                                    id,
+                                    module,
+                                    backCols,
+                                    dtKey,
+                                    getDecimatorsPayload(
+                                        config.decimators,
+                                        plotRef.current,
+                                        config.modes,
+                                        config.columns?.length ? config.columns[0] : {},
+                                        config.traces,
+                                        eventData
+                                    )
+                                )
+                            )
+                        );
+                        return [dtKey, ...oldDataKeys.slice(1)];
+                    }
+                    return oldDataKeys;
+                });
             }
         },
         [
@@ -646,15 +725,21 @@ const Chart = (props: ChartProp) => {
     );
 
     const getRealIndex = useCallback(
-        (index?: number) =>
-            typeof index === "number"
+        (dataIdx: number, index?: number) => {
+            const lData = getData(data, additionalDatas, dataIdx);
+            if (!lData) {
+                return index || 0;
+            }
+            const dtKey = dataKeys[dataIdx];
+            return typeof index === "number"
                 ? props.figure
                     ? index
-                    : data[dataKey].tp_index
-                    ? (data[dataKey].tp_index[index] as number)
+                    : lData[dtKey].tp_index
+                    ? (lData[dtKey].tp_index[index] as number)
                     : index
-                : 0,
-        [data, dataKey, props.figure]
+                : 0;
+        },
+        [data, additionalDatas, dataKeys, props.figure]
     );
 
     const onSelect = useCallback(
@@ -662,7 +747,7 @@ const Chart = (props: ChartProp) => {
             if (updateVars) {
                 const traces = (evt?.points || []).reduce((tr, pt) => {
                     tr[pt.curveNumber] = tr[pt.curveNumber] || [];
-                    tr[pt.curveNumber].push(getRealIndex(getPlotIndex(pt)));
+                    tr[pt.curveNumber].push(getRealIndex(pt.curveNumber, getPlotIndex(pt)));
                     return tr;
                 }, [] as number[][]);
                 if (config.traces.length === 0) {

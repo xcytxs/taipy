@@ -73,7 +73,7 @@ def test__chart_conf(gui: Gui):
 
         d = json.loads(res)
         assert isinstance(d, dict)
-        assert d["columns"]["col1"]["type"] == "int"
+        assert d["columns"][0]["col1"]["type"] == "int"
 
         res = gui._chart_conf(False, None, "", "")
         assert repr(res) == "Taipy: Do not update"

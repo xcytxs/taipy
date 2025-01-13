@@ -492,7 +492,7 @@
                         "name": "data",
                         "default_property": true,
                         "required": true,
-                        "type": "dynamic(Any)",
+                        "type": "indexed(dynamic(Any))",
                         "doc": "The data object bound to this chart control.<br/>See the section on the <a href=\"#the-data-property\"><i>data</i> property</a> below for more details."
                     },
                     {
