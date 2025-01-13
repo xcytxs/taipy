@@ -42,6 +42,7 @@ interface AxiosRenderer {
     style: string;
     head: HeadProps[];
     context: string;
+    scriptPaths: string[];
 }
 
 // set global style the traditional way
@@ -59,6 +60,18 @@ const setStyle = (id: string, styleString: string): void => {
     if (style) {
         style.textContent = styleString;
     }
+};
+
+// set script tag for the page
+const setScript = (id: string, scriptPaths: string[]): void => {
+    document.querySelectorAll(`script[id^="${id}_"]`).forEach(script => script.remove());
+    scriptPaths.forEach((path, index) => {
+        const script = document.createElement("script");
+        script.id = `${id}_${index}`;
+        script.src = path;
+        script.defer = true;
+        document.head.append(script);
+    });
 };
 
 interface PageState {
@@ -97,9 +110,10 @@ const TaipyRendered = (props: TaipyRenderedProps) => {
                     if (!fromBlock) {
                         setStyle(
                             path == "/TaiPy_root_page" ? "Taipy_root_style" : "Taipy_style",
-                            result.data.style || ""
+                            result.data.style || "",
                         );
                         Array.isArray(result.data.head) && setHead(result.data.head);
+                        Array.isArray(result.data.scriptPaths) && setScript("Taipy_script", result.data.scriptPaths);
                     }
                 })
                 .catch((error) => {

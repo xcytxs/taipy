@@ -13,8 +13,11 @@ from __future__ import annotations
 
 import inspect
 import typing as t
+from pathlib import Path
 from types import FrameType
+from urllib.parse import urlparse
 
+from ._warnings import _warn
 from .utils import _filter_locals, _get_module_name_from_frame
 
 if t.TYPE_CHECKING:
@@ -75,6 +78,7 @@ class Page:
         self._notebook_gui: t.Optional["Gui"] = None
         self._notebook_page: t.Optional["_Page"] = None
         self.set_style(kwargs.get("style", None))
+        self._script_paths(kwargs.get("script_paths", None))
 
     def create_page(self) -> t.Optional[Page]:
         """Create the page content for page modules.
@@ -180,3 +184,34 @@ class Page:
 
     def _get_style(self):
         return self.__style
+
+    def _script_paths(self, script_paths: t.Optional[t.Union[str, Path, t.List[t.Union[str, Path]]]]) -> Page:
+        """
+        Load a script or a list of scripts to be used in the page.
+
+        Arguments:
+            script_paths (str, Path, list): The path to the script file or a list of paths to the script files.
+
+        Returns:
+            This `Page` instance.
+        """
+        if script_paths:
+            if isinstance(script_paths, (str, Path)):
+                script_paths = [script_paths]
+            for script_path in script_paths:
+                if isinstance(script_path, str):
+                    parsed_url = urlparse(script_path)
+                    if parsed_url.netloc:
+                        continue
+                    script_path = Path(script_path)
+
+                if isinstance(script_path,
+                              Path) and script_path.exists() and script_path.is_file() and script_path.suffix == ".js":
+                    continue
+                else:
+                    _warn(f"Script path '{script_path}' does not exist, is not a file, or is not a JavaScript file.")
+        self.__script_paths = script_paths if script_paths else None
+        return self
+
+    def _get_script_paths(self):
+        return self.__script_paths
