@@ -10,7 +10,7 @@
 # specific language governing permissions and limitations under the License.
 
 from copy import copy
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -708,5 +708,69 @@ class TestDataNodeConfigChecker:
         assert len(Config._collector.errors) == 0
 
         config._sections[DataNodeConfig.name]["default"].properties = {"exposed_type": MyCustomClass}
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+    def test_check_property_types(self, caplog):
+        config = Config._applied_config
+        Config._compile_configs()
+        config._sections[DataNodeConfig.name]["default"].storage_type = "pickle"
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": "string"}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": 1}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": 1.}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": True}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": ["foo", "bar"]}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": ("foo", "bar")}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": {"foo": "bar"}}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": {"foo", "bar"}}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": None}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": print}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": datetime(2021, 7, 26)}
+        Config._collector = IssueCollector()
+        Config.check()
+        assert len(Config._collector.errors) == 0
+
+        config._sections[DataNodeConfig.name]["default"].properties = {"default_data": timedelta(7)}
+        Config._collector = IssueCollector()
         Config.check()
         assert len(Config._collector.errors) == 0
