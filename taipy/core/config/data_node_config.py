@@ -11,7 +11,7 @@
 
 import json
 from copy import copy
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy
@@ -41,7 +41,7 @@ class DataNodeConfig(Section):
     """
 
     name = "DATA_NODE"
-    _ALL_TYPES = (str, int, float, bool, list, dict, tuple, set, type(None), callable)
+    _ALL_TYPES = (str, int, float, bool, list, dict, tuple, set, type(None), callable, datetime, timedelta)
     _STORAGE_TYPE_KEY = "storage_type"
     _STORAGE_TYPE_VALUE_PICKLE = "pickle"
     _STORAGE_TYPE_VALUE_SQL_TABLE = "sql_table"

@@ -77,8 +77,9 @@ inform the community that you are working on it. Then, follow the steps below:
 
 ### Contribution workflow
 
-1. Make your [own fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) of the repository
-   targeted by the issue. Clone it on your local machine, then go inside the directory.
+1. Make your [own fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo)
+   of the repository targeted by the issue. Clone it on your local machine, then go inside the
+   directory.
 
 2. We are working with [Pipenv](https://github.com/pypa/pipenv) for our virtualenv.
    Create a local env and install development package by running `$ pipenv install --dev`, then
@@ -129,12 +130,14 @@ issue or PR if you're still interested in working on it.
 ### Python
 
 Taipy's repositories follow the [PEP 8](https://www.python.org/dev/peps/pep-0008/) and
-[PEP 484](https://www.python.org/dev/peps/pep-0484/) coding convention. Gui variables need to be `snake_case` to be correctly converted into the `camelCase`, used for typescript variables.
+[PEP 484](https://www.python.org/dev/peps/pep-0484/) coding convention. Gui variables need to
+be `snake_case` to be correctly converted into the `camelCase`, used for typescript variables.
 
 ### TypeScript
 
 Taipy's repositories use the [ESLint](https://eslint.org/) and
-[TypeScript ESLint](https://github.com/typescript-eslint/typescript-eslint) plugin to ensure a common set of rules.
+[TypeScript ESLint](https://github.com/typescript-eslint/typescript-eslint) plugin to ensure a
+common set of rules.
 
 ### Git branches
 
@@ -149,12 +152,12 @@ Where:
     - bug: bug fix.
     - review: change provoked by review comment not immediately taken care of.
     - refactor: refactor of a piece of code.
-    - doc: doc changes (complement or typo fixes…).
+    - doc: doc changes (complement or typo fixes...).
     - build: in relation with the build process.
 - `<issueId>` is the processed issue identifier. The advantage of explicitly indicating the issue
     number is that inGitHub, a pull request page shows a direct link to the issue description.
 - `[IssueSummary]` is a short summary of the issue topic, not including spaces, using Camel case
-    or lower-case, dash-separated words. This summary, with its dash (‘-’) symbol prefix, is
+    or lower-case, dash-separated words. This summary, with its dash ('-') symbol prefix, is
     optional.
 
 ## Dependency management
