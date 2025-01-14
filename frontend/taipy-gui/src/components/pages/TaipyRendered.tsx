@@ -11,12 +11,12 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import React, { ComponentType, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { ErrorBoundary } from "react-error-boundary";
 import { Helmet } from "react-helmet-async";
 import JsxParser from "react-jsx-parser";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 import { PageContext, TaipyContext } from "../../context/taipyContext";
 import { createPartialAction } from "../../context/taipyReducers";
@@ -140,7 +140,7 @@ const TaipyRendered = (props: TaipyRenderedProps) => {
                 <JsxParser
                     disableKeyGeneration={true}
                     bindings={state.data}
-                    components={getRegisteredComponents() as Record<string, ComponentType>}
+                    components={getRegisteredComponents()}
                     jsx={pageState.jsx}
                     renderUnrecognized={unregisteredRender}
                     allowUnknownElements={false}

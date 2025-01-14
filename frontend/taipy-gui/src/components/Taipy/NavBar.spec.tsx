@@ -15,7 +15,7 @@ import React from "react";
 import {render} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 
 import NavBar from './NavBar';
 import { LoV } from "./lovUtils";

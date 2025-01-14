@@ -14,7 +14,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 
 import Link from "./Link";
 import { INITIAL_STATE, TaipyState } from "../../context/taipyReducers";

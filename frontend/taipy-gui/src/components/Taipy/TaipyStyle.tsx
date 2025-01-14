@@ -29,7 +29,7 @@ interface TaipyStyleProps {
 export const getComponentClassName = (children: ReactNode) =>
     (
         React.Children.map(children, (element) =>
-            React.isValidElement(element) && element.type == TaipyStyle ? element.props.className : undefined
+            React.isValidElement(element) && element.type == TaipyStyle ? (element.props as Record<string, unknown>).className : undefined
         )?.filter((v) => v) || []
     ).join(" ");
 

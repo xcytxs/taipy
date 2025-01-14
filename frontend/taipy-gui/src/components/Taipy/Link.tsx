@@ -12,7 +12,7 @@
  */
 
 import React, { ReactNode, useContext, useMemo } from "react";
-import { Link as RouterLink, useMatch, useResolvedPath } from "react-router-dom";
+import { Link as RouterLink, useMatch, useResolvedPath } from "react-router";
 import MuiLink from "@mui/material/Link";
 import { TaipyContext } from "../../context/taipyContext";
 

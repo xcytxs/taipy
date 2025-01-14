@@ -46,7 +46,7 @@ import Toggle from "./Toggle";
 import TimeSelector from "./TimeSelector";
 import TreeView from "./TreeView";
 
-const registeredComponents: Record<string, ComponentType> = {};
+const registeredComponents: Record<string, ComponentType<object>> = {};
 
 export const getRegisteredComponents = () => {
     if (registeredComponents.TreeView === undefined) {
@@ -106,5 +106,5 @@ export const getRegisteredComponents = () => {
             });
         }
     }
-    return registeredComponents;
+    return registeredComponents  as Record<string, ComponentType<object>>;
 };

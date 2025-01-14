@@ -13,7 +13,7 @@
 
 import { useContext, useEffect } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 import { TaipyContext } from "../../context/taipyContext";
 import { createNavigateAction } from "../../context/taipyReducers";
@@ -49,7 +49,8 @@ const Navigate = ({ to, params, tab, force }: NavigateProps) => {
             const reloadAll = params?.tp_reload_all === "true";
             const reloadSameRouteOnly = params?.tp_reload_same_route_only === "true";
             if (reloadAll) {
-                return navigate(0);
+                navigate(0);
+                return;
             }
             if (reloadSameRouteOnly) {
                 if (location.pathname === tos) {

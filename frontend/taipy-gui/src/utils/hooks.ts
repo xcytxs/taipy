@@ -191,7 +191,7 @@ export const useWhyDidYouUpdate = (name: string, props: Record<string, unknown>)
     });
 };
 
-export const useElementVisible = (ref: RefObject<HTMLElement>) => {
+export const useElementVisible = (ref: RefObject<HTMLElement | null>) => {
     const observerRef = useRef<IntersectionObserver | null>(null);
     const [isOnScreen, setIsOnScreen] = useState(false);
 

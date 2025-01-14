@@ -28,8 +28,8 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 mockedAxios.get.mockRejectedValue("Network error: Something went wrong");
 mockedAxios.get.mockResolvedValue({ data: { jsx_no: '<div key="mock" data-testid="mocked"></div>' } });
 
-jest.mock("react-router-dom", () => ({
-    ...jest.requireActual("react-router-dom"),
+jest.mock("react-router", () => ({
+    ...jest.requireActual("react-router"),
     useLocation: () => ({
         pathname: "pathname",
     }),
