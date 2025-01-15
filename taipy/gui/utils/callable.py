@@ -11,7 +11,6 @@
 
 import typing as t
 from inspect import isclass
-from types import LambdaType
 
 
 def _is_function(s: t.Any) -> bool:
@@ -28,4 +27,4 @@ def _function_name(s: t.Any) -> str:
 
 
 def _is_unnamed_function(s: t.Any):
-    return isinstance(s, LambdaType) or (callable(s) and not hasattr(s, "__name__"))
+    return (hasattr(s, "__name__") and s.__name__ == "<lambda>") or (callable(s) and not hasattr(s, "__name__"))

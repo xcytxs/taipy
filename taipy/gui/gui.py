@@ -1948,10 +1948,11 @@ class Gui:
         return _getscopeattr(self, Gui.__UI_BLOCK_NAME, False)
 
     def __get_on_cancel_block_ui(self, callback: t.Optional[str]):
-        def _taipy_on_cancel_block_ui(guiApp, id: t.Optional[str], payload: t.Any):
-            if _hasscopeattr(guiApp, Gui.__UI_BLOCK_NAME):
-                _setscopeattr(guiApp, Gui.__UI_BLOCK_NAME, False)
-            guiApp.__on_action(id, {"action": callback})
+        def _taipy_on_cancel_block_ui(a_state: State, id: t.Optional[str], payload: t.Any):
+            gui_app = a_state.get_gui()
+            if _hasscopeattr(gui_app, Gui.__UI_BLOCK_NAME):
+                _setscopeattr(gui_app, Gui.__UI_BLOCK_NAME, False)
+            gui_app.__on_action(id, {"action": callback})
 
         return _taipy_on_cancel_block_ui
 
@@ -2391,15 +2392,13 @@ class Gui:
         callback: t.Optional[t.Union[str, t.Callable]] = None,
         message: t.Optional[str] = "Work in Progress...",
     ):  # pragma: no cover
-        action_name = (
-            callback
-            if isinstance(callback, str)
-            else _get_lambda_id(t.cast(LambdaType, callback))
-            if _is_unnamed_function(callback)
-            else callback.__name__
-            if callback is not None
-            else None
-        )
+        if _is_unnamed_function(callback):
+            action_name = _get_lambda_id(t.cast(LambdaType, callback))
+            self._bind_var_val(action_name, callback)
+        else:
+            action_name = (
+                callback if isinstance(callback, str) else (callback.__name__ if callback is not None else None)
+            )
         func = self.__get_on_cancel_block_ui(action_name)
         def_action_name = func.__name__
         _setscopeattr(self, def_action_name, func)
@@ -2579,7 +2578,11 @@ class Gui:
             with self._set_locals_context(context):
                 self._call_on_page_load(nav_page)
             return self._server._render(
-                page._rendered_jsx, page._script_paths if page._script_paths is not None else [], page._style if page._style is not None else "", page._head, context # noqa: E501
+                page._rendered_jsx,
+                page._script_paths if page._script_paths is not None else [],
+                page._style if page._style is not None else "",
+                page._head,
+                context,  # noqa: E501
             )
         else:
             return ("No page template", 404)
